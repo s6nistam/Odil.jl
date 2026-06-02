@@ -14,6 +14,4 @@ export solve_d2dt2_central!
 
 greet() = print("Hello ODIL!")
 
-greet()
-
 end # module Odil

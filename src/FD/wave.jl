@@ -1,11 +1,16 @@
-function rhs_wave(u, it, dx)
-   
-    rhs = zero(u[:,it])
+function rhs!(du, u, it, p)
+    dx = p 
     
-    # Differenzenquotient im Inneren
+    fill!(du, 0.0)
+    
     for j in 2:size(u, 1)-1
-        rhs[j] = (u[j-1, it] - 2 * u[j, it] + u[j+1, it]) / (dx*dx)
+        du[j] = (u[j-1, it] - 2 * u[j, it] + u[j+1, it]) / (dx * dx)
     end
 
-    return rhs
+    t_val = t[it] 
+    
+    u[1, it] = get_exact_wave(0.0, t_val)
+    u[end, it] = get_exact_wave(1.0, t_val)
+    
+    return nothing
 end

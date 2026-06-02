@@ -2,8 +2,8 @@ using Odil
 
 Odil.greet()
 
-Nx = 100
-Nt = 100
+Nx = 64
+Nt = 64
 
 x = range(0, 1, length=Nx)
 t = range(-.5, .5, length=Nt)
