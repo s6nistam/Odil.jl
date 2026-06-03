@@ -10,8 +10,8 @@ include("../src/solvers/odil_lbfgsb.jl")
 
 Odil.greet()
 
-Nx = 64
-Nt = 64
+Nx = 16
+Nt = 16
 
 x = range(0, 1, length=Nx)
 t = range(-.5, .5, length=Nt)
@@ -39,30 +39,30 @@ u_exact  = [get_exact_wave(xi, ti) for xi in x, ti in t]
 f = ODEFunction{true}((du, u, p, t) -> rhs!(du, u, t, p))
 ode = ODEProblem{true}(f, u_exact[:, 1], tspan, dx)
 
-function lhs!(du, u, dt, it)
-    fill!(du, 0.0)
+function lhs!(du, u, p, it)
+    # Entpacke die benötigten Konstanten und Gitter-Vektoren aus p
+    dt = p
     
-    # Indizes für den Raum (wir lassen die Ränder j=1 und j=end bei 0)
+    fill!(du, 0.0)
     Nx = size(u, 1)
     
     if it == 1
-        # t=0: Wir benötigen hier eine konsistente Beschleunigung.
-        # Wir extrapolieren aus den ersten drei Zeitschichten (t=1, t=2, t=3),
-        # um den Wert der zweiten Ableitung bei t=1 zu schätzen.
-        # Approximation: u_tt(t_1) ≈ (u_1 - 2*u_2 + u_3) / dt^2
+        t0 = t[1]
+        
         for j in 2:Nx-1
-            du[j] = (u[j, 1] - 2*u[j, 2] + u[j, 3]) / dt^2
+            u0 = get_exact_wave(t0, x[j])
+            v0 = get_exact_wave_velocity(t0, x[j])
+            
+            du[j] = 2 * (u[j, 2] - u0 - dt * v0) / dt^2
+            # du[j] = 0
         end
         
     elseif it < size(u, ndims(u))
-        # Standard: Zentrale Differenz zweiter Ordnung (t > 0)
         for j in 2:Nx-1
             du[j] = (u[j, it+1] - 2 * u[j, it] + u[j, it-1]) / dt^2
         end
         
     else
-        # Letzter Zeitschritt: Hier ist der Standard-Zentraldifferenz-Operator 
-        # nicht definiert, da it+1 außerhalb liegt.
         du .= 0
     end
     

@@ -9,6 +9,8 @@ include("time_integration/second.jl")
 
 export plot_comparison
 export get_exact_wave
+export get_exact_wave_velocity
+export rhs!
 export rhs_wave
 export solve_d2dt2_central!
 
