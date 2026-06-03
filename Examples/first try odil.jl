@@ -2,16 +2,16 @@ using Odil
 import Pkg
 Pkg.add("SciMLBase")
 Pkg.add("OptimizationBase")
-Pkg.add("OptimizationLBFGSB")
+Pkg.add("OptimizationOptimJL")
 Pkg.add("ADTypes")
 Pkg.add("Enzyme")
 include("../src/FD/wave.jl")
-include("../src/solvers/odil_lbfgsb.jl")
+include("../src/solvers/odil_lbfgs.jl")
 
 Odil.greet()
 
-Nx = 16
-Nt = 16
+Nx = 32
+Nt = 32
 
 x = range(0, 1, length=Nx)
 t = range(-.5, .5, length=Nt)
@@ -36,40 +36,41 @@ u_exact  = [get_exact_wave(xi, ti) for xi in x, ti in t]
 # u_fd[end, :] .= u_exact[end, :]
 
 # solve_d2dt2_central!(u_fd, rhs_wave, dx, dt)
-f = ODEFunction{true}((du, u, p, t) -> rhs!(du, u, t, p))
-ode = ODEProblem{true}(f, u_exact[:, 1], tspan, dx)
+f = ODEFunction{true}(rhs!)
+ode = ODEProblem{true}(f, u_exact[:, 1], tspan, (dx, x, t))
 
 function lhs!(du, u, p, it)
-    # Entpacke die benötigten Konstanten und Gitter-Vektoren aus p
-    dt = p
-    
+    dt, x_array, t_array = p 
     fill!(du, 0.0)
     Nx = size(u, 1)
     
+    # --- 1. DAS INNERE ---
     if it == 1
-        t0 = t[1]
+        t0 = t_array[1]
+        # NEU: Das Gewicht zwingt den Optimierer, die Geschwindigkeit einzuhalten!
+        penalty_vel = 10 
         
         for j in 2:Nx-1
-            u0 = get_exact_wave(t0, x[j])
-            v0 = get_exact_wave_velocity(t0, x[j])
-            
-            du[j] = 2 * (u[j, 2] - u0 - dt * v0) / dt^2
-            # du[j] = 0
+            u0 = get_exact_wave(x_array[j], t0)
+            v0 = get_exact_wave_velocity(x_array[j], t0)
+            du[j] = penalty_vel * 2 * (u[j, 2] - u0 - dt * v0) / dt^2
         end
-        
     elseif it < size(u, ndims(u))
+        # Keine Strafe ab t > 0, hier gilt reine Physik
         for j in 2:Nx-1
             du[j] = (u[j, it+1] - 2 * u[j, it] + u[j, it-1]) / dt^2
         end
-        
-    else
-        du .= 0
     end
+    
+    # --- 2. DIE RÄNDER ---
+    penalty_bc = 10
+    du[1]  = penalty_bc * u[1, it]
+    du[Nx] = penalty_bc * u[Nx, it]
     
     return nothing
 end
 
-u = odil_lbfgsb(ode, lhs!, dx, Nt)
+u = odil_lbfgs(ode, lhs!, (dt, x, t), Nt)
 # u_opt_matrix = reshape(res.u, Nx, Nt)
 
 plot_comparison(x, t, u_exact, u)

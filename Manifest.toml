@@ -2,7 +2,7 @@
 
 julia_version = "1.12.6"
 manifest_format = "2.0"
-project_hash = "2c7bf10cccbe8739afd4c2171d0d4e0f1df45924"
+project_hash = "a28a240dbc1e23bf2db110d6b7ce8ed260539940"
 
 [[deps.ADTypes]]
 git-tree-sha1 = "bbc22a9a08a0ef6460041086d8a7b27940ed4ffd"
@@ -953,7 +953,7 @@ uuid = "d8793406-e978-5875-9003-1fc021f44a92"
 version = "0.5.0"
 
 [[deps.Odil]]
-deps = ["ADTypes", "Enzyme", "LinearAlgebra", "NLSolversBase", "Optim", "OptimizationBase", "OptimizationLBFGSB", "Plots", "SciMLBase", "Zygote"]
+deps = ["ADTypes", "Enzyme", "LinearAlgebra", "NLSolversBase", "Optim", "OptimizationBase", "OptimizationLBFGSB", "OptimizationOptimJL", "Plots", "SciMLBase", "Zygote"]
 path = "."
 uuid = "c15e9705-4550-4157-9636-e6a06c04b4f1"
 version = "0.1.0-DEV"
@@ -1038,6 +1038,12 @@ deps = ["DocStringExtensions", "LBFGSB", "OptimizationBase", "Reexport", "SciMLB
 git-tree-sha1 = "5fedb84af689389ea07b275c9145b011e2d4a75e"
 uuid = "22f7324a-a79d-40f2-bebe-3af60c77bd15"
 version = "1.4.1"
+
+[[deps.OptimizationOptimJL]]
+deps = ["Optim", "OptimizationBase", "Reexport", "SciMLBase", "SparseArrays"]
+git-tree-sha1 = "c1494ecd921c413ce27706784e06907a4ed5bfc1"
+uuid = "36348300-93cb-4f02-beb5-3c3902f8871e"
+version = "0.4.14"
 
 [[deps.Opus_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]

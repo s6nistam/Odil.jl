@@ -1,6 +1,6 @@
-using SciMLBase, OptimizationBase, OptimizationLBFGSB, ADTypes, Enzyme, LinearAlgebra
+using SciMLBase, OptimizationBase, OptimizationOptimJL, ADTypes, Enzyme, LinearAlgebra
 
-function odil_lbfgsb(ode::ODEProblem, lhs_func, p_lhs, Nt = 1000)
+function odil_lbfgs(ode::ODEProblem, lhs_func, p_lhs, Nt = 1000)
     u_t0 = ode.u0
     
     space_dims = size(u_t0)
@@ -31,7 +31,7 @@ function odil_lbfgsb(ode::ODEProblem, lhs_func, p_lhs, Nt = 1000)
         l_init = zero(eltype(u_vec))
 
         for i in 1:length(u_t0_inner)
-            l_init += (u_local[i] - u_t0_inner[i])^2
+            l_init += 100 *(u_local[i] - u_t0_inner[i])^2
         end
 
         l_inner = zero(eltype(u_vec))
@@ -58,13 +58,13 @@ function odil_lbfgsb(ode::ODEProblem, lhs_func, p_lhs, Nt = 1000)
     
     optf = OptimizationFunction(loss, ADTypes.AutoEnzyme())
     prob = OptimizationProblem(optf, u_iter0, p_all) 
-    opt = LBFGSB(m = 50)
-    # opt = LBFGSB()
+    # opt = LBFGS(m = 50)
+    opt = LBFGS()
 
     counter = 0
     callback = function (state, l)
         counter += 1
-        if counter % 10 == 0 || counter == 1
+        if counter % 1000 == 0 || counter == 1
             println("Iteration ", counter, ": Loss = ", l)
 
             u_current = zeros(eltype(u_t0), space_dims..., Nt)
@@ -77,13 +77,14 @@ function odil_lbfgsb(ode::ODEProblem, lhs_func, p_lhs, Nt = 1000)
     end
     
     println("Starte Lösung...")
-    res = solve(prob, opt, factr = 0.0, maxiters = 100000, callback = callback)
+    res = solve(prob, opt, maxiters = 100000, callback = callback)
     
     # Ergebnis für den Output wieder rekonstruieren
     u_final = zeros(eltype(u_t0), space_dims..., Nt)
     for i in 1:length(res.u)
         u_final[i] = res.u[i]
     end
-    
+    println("Optimierung beendet!")
+    println("Return Code: ", res.retcode)
     return u_final
 end
