@@ -18,10 +18,6 @@ function odil_lbfgs(ode::ODEProblem, lhs_func, p_lhs, Nt = 1000)
         p_rhs, p_lhs_inner, u_t0_inner = p
         
         u_local = zeros(eltype(u_vec), space_dims..., Nt)
-
-        # for i in 1:num_cells
-        #     u_local[i] = u_t0_inner[i]
-        # end
         
         for i in 1:length(u_vec)
             # u_local[num_cells + i] = u_vec[i]
@@ -31,7 +27,7 @@ function odil_lbfgs(ode::ODEProblem, lhs_func, p_lhs, Nt = 1000)
         l_init = zero(eltype(u_vec))
 
         for i in 1:length(u_t0_inner)
-            l_init += 100 *(u_local[i] - u_t0_inner[i])^2
+            l_init += Nt^2 *(u_local[i] - u_t0_inner[i])^2
         end
 
         l_inner = zero(eltype(u_vec))
@@ -77,7 +73,7 @@ function odil_lbfgs(ode::ODEProblem, lhs_func, p_lhs, Nt = 1000)
     end
     
     println("Starte Lösung...")
-    res = solve(prob, opt, maxiters = 100000, callback = callback)
+    res = solve(prob, opt, maxiters = 10000000, callback = callback)
     
     # Ergebnis für den Output wieder rekonstruieren
     u_final = zeros(eltype(u_t0), space_dims..., Nt)

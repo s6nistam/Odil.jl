@@ -42,28 +42,24 @@ ode = ODEProblem{true}(f, u_exact[:, 1], tspan, (dx, x, t))
 function lhs!(du, u, p, it)
     dt, x_array, t_array = p 
     fill!(du, 0.0)
-    Nx = size(u, 1)
+    Nx = length(x_array)
+    Nt = length(t_array)
     
-    # --- 1. DAS INNERE ---
     if it == 1
         t0 = t_array[1]
-        # NEU: Das Gewicht zwingt den Optimierer, die Geschwindigkeit einzuhalten!
-        penalty_vel = 10 
+        penalty_vel = Nt 
         
         for j in 2:Nx-1
-            u0 = get_exact_wave(x_array[j], t0)
             v0 = get_exact_wave_velocity(x_array[j], t0)
-            du[j] = penalty_vel * 2 * (u[j, 2] - u0 - dt * v0) / dt^2
+            du[j] = penalty_vel * 2 * (u[j, 2] - u[j, 1] - dt * v0) / dt^2
         end
     elseif it < size(u, ndims(u))
-        # Keine Strafe ab t > 0, hier gilt reine Physik
         for j in 2:Nx-1
             du[j] = (u[j, it+1] - 2 * u[j, it] + u[j, it-1]) / dt^2
         end
     end
-    
-    # --- 2. DIE RÄNDER ---
-    penalty_bc = 10
+
+    penalty_bc = Nx
     du[1]  = penalty_bc * u[1, it]
     du[Nx] = penalty_bc * u[Nx, it]
     
