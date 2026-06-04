@@ -50,7 +50,7 @@ function lhs!(du, u, p, it)
         
         for j in 2:Nx-1
             v0 = get_exact_wave_velocity(x_array[j], t0)
-            du[j] = penalty_vel * 2 * (u[j, 2] - u[j, 1] - dt * v0) / dt^2
+            du[j] = penalty_vel * (u[j, 2] - u[j, 1] - dt * v0) / dt^2
         end
     elseif it < size(u, ndims(u))
         for j in 2:Nx-1
