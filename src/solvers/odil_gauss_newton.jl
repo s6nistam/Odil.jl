@@ -1,49 +1,43 @@
 using SciMLBase, NonlinearSolveFirstOrder, ADTypes, Enzyme, LinearAlgebra
 
-function odil_gauss_newton(ode::ODEProblem, lhs_func, p_lhs, Nt = 1000)
-    u_t0 = ode.u0
-    
+function odil_gauss_newton(lhs, rhs, p_lhs, p_rhs, u_t0, Nt = 1000)
     space_dims = size(u_t0)
     num_cells = prod(space_dims)
-    # num_unknowns = num_cells * (Nt - 1)
     num_unknowns = num_cells * Nt
     
     u_iter0 = zeros(eltype(u_t0), num_unknowns)
-    
-    rhs_func = ode.f.f
 
-    p_all = (ode.p, p_lhs, u_t0)
+    p_all = (p_rhs, p_lhs, u_t0, space_dims, num_cells, num_unknowns, Nt)
 
     function operator_loss(u_vec, p)
-        p_rhs, p_lhs_inner, u_t0_inner = p
+        p_rhs_inner, p_lhs_inner, u_t0_inner, space_dims_inner, num_cells_inner, num_unknowns_inner, Nt_inner = p
         
-        u_local = zeros(eltype(u_vec), space_dims..., Nt)
+        u_local = zeros(eltype(u_vec), space_dims_inner..., Nt_inner)
         
-        for i in 1:length(u_vec)
-            # u_local[num_cells + i] = u_vec[i]
+        for i in 1:num_unknowns_inner
             u_local[i] = u_vec[i]
         end
         
-        l_init = zeros(eltype(u_vec), space_dims..., Nt)
+        l_init = zeros(eltype(u_vec), space_dims_inner..., Nt_inner)
 
-        for i in 1:length(u_t0_inner)
-            l_init[i] += Nt *(u_local[i] - u_t0_inner[i])
+        for i in 1:num_cells_inner
+            l_init[i] += Nt_inner *(u_local[i] - u_t0_inner[i])
         end
 
-        l_inner = zeros(eltype(u_vec), space_dims..., Nt)
+        l_inner = zeros(eltype(u_vec), space_dims_inner..., Nt_inner)
         
         du_rhs = similar(u_local)
         du_lhs = similar(u_local)
         
-        for it in 1:(Nt - 1)
+        for it in 1:(Nt_inner - 1)
             fill!(du_rhs, 0.0)
             fill!(du_lhs, 0.0)
             
-            rhs_func(du_rhs, u_local, p_rhs, it)
-            lhs_func(du_lhs, u_local, p_lhs_inner, it)
+            rhs(du_rhs, u_local, p_rhs_inner, it)
+            lhs(du_lhs, u_local, p_lhs_inner, it)
             
-            for i in 1:num_cells
-                l_inner[it * num_cells + i] += (du_rhs[i] - du_lhs[i])
+            for i in 1:num_cells_inner
+                l_inner[it * num_cells_inner + i] += (du_rhs[i] - du_lhs[i])
             end
         end
 
@@ -51,6 +45,7 @@ function odil_gauss_newton(ode::ODEProblem, lhs_func, p_lhs, Nt = 1000)
 
         return l
     end
+    
     prob = NonlinearLeastSquaresProblem(operator_loss, u_iter0, p_all)
     opt = GaussNewton(autodiff = AutoEnzyme())
 

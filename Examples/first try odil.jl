@@ -36,37 +36,8 @@ u_exact  = [get_exact_wave(xi, ti) for xi in x, ti in t]
 # u_fd[end, :] .= u_exact[end, :]
 
 # solve_d2dt2_central!(u_fd, rhs_wave, dx, dt)
-f = ODEFunction{true}(rhs!)
-ode = ODEProblem{true}(f, u_exact[:, 1], tspan, (dx, x, t))
 
-function lhs!(du, u, p, it)
-    dt, x_array, t_array = p 
-    fill!(du, 0.0)
-    Nx = length(x_array)
-    Nt = length(t_array)
-    
-    if it == 1
-        t0 = t_array[1]
-        penalty_vel = Nt 
-        
-        for j in 2:Nx-1
-            v0 = get_exact_wave_velocity(x_array[j], t0)
-            du[j] = penalty_vel * (u[j, 2] - u[j, 1] - dt * v0) / dt^2
-        end
-    elseif it < size(u, ndims(u))
-        for j in 2:Nx-1
-            du[j] = (u[j, it+1] - 2 * u[j, it] + u[j, it-1]) / dt^2
-        end
-    end
-
-    penalty_bc = Nx/2
-    du[1]  = penalty_bc * (u[1, it + 1] - get_exact_wave(x_array[1], t_array[it + 1]))
-    du[Nx] = penalty_bc * (u[Nx, it + 1] - get_exact_wave(x_array[Nx], t_array[it + 1]))
-    
-    return nothing
-end
-
-u = odil_lbfgs(ode, lhs!, (dt, x, t), Nt)
+u = odil_lbfgs(lhs!, rhs!, (dt, x, t), (dx, x, t), u_exact[:, 1], Nt)
 # u_opt_matrix = reshape(res.u, Nx, Nt)
 
 plot_comparison(x, t, u_exact, u)
