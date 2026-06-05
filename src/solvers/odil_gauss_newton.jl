@@ -35,7 +35,7 @@ function odil_gauss_newton(ode::ODEProblem, lhs_func, p_lhs, Nt = 1000)
         du_rhs = similar(u_local)
         du_lhs = similar(u_local)
         
-        for it in 1:Nt
+        for it in 1:(Nt - 1)
             fill!(du_rhs, 0.0)
             fill!(du_lhs, 0.0)
             
@@ -43,7 +43,7 @@ function odil_gauss_newton(ode::ODEProblem, lhs_func, p_lhs, Nt = 1000)
             lhs_func(du_lhs, u_local, p_lhs_inner, it)
             
             for i in 1:num_cells
-                l_inner[(it - 1) * num_cells + i] += (du_rhs[i] - du_lhs[i])
+                l_inner[it * num_cells + i] += (du_rhs[i] - du_lhs[i])
             end
         end
 
@@ -70,7 +70,7 @@ function odil_gauss_newton(ode::ODEProblem, lhs_func, p_lhs, Nt = 1000)
     end
     
     println("Starte Lösung...")
-    res = solve(prob, opt, maxiters = 10000000, callback = callback)
+    res = solve(prob, opt, maxiters = 2, callback = callback)
     
     # Ergebnis für den Output wieder rekonstruieren
     u_final = zeros(eltype(u_t0), space_dims..., Nt)

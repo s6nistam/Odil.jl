@@ -35,7 +35,7 @@ function odil_lbfgs(ode::ODEProblem, lhs_func, p_lhs, Nt = 1000)
         du_rhs = similar(u_local)
         du_lhs = similar(u_local)
         
-        for it in 1:Nt
+        for it in 1:(Nt - 1)
             fill!(du_rhs, 0.0)
             fill!(du_lhs, 0.0)
             
