@@ -41,10 +41,8 @@ t_bounds_left = [it for it in 2:Nt]
 t_bounds_right = [it for it in 2:Nt]
 t_fixed_indicies = [t_t0; t_bounds_left; t_bounds_right]
 
-
 u_size_x = Nx
 
 u = odil_lbfgs(lhs!, rhs!, p_lhs, p_rhs, u_size_x, u_fixed_vals, x_fixed_indicies, t_fixed_indicies, Nt)
 
-plot_comparison(x, t, u_exact, u)
-
+plot_2d(x, t, u)
