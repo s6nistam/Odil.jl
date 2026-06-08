@@ -5,6 +5,8 @@ Pkg.add("OptimizationBase")
 Pkg.add("OptimizationOptimJL")
 Pkg.add("ADTypes")
 Pkg.add("Enzyme")
+Pkg.add("ColorSchemes")
+Pkg.add("Plots")
 include("../src/semidiscretization/wave.jl")
 include("../src/solvers/odil_lbfgs.jl")
 
