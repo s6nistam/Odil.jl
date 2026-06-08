@@ -5,6 +5,7 @@ authors = ["Benedict Geihe <bgeihe@uni-koeln.de>"]
 
 [deps]
 ADTypes = "47edcb42-4c32-4615-8424-f2b9edc5f35b"
+ColorSchemes = "35d6a980-a343-548e-a6ea-1d62b119f2f4"
 Enzyme = "7da242da-08ed-463a-9acd-ee780be4f1d9"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 NLSolversBase = "d41bc354-129a-5804-8e4c-c37616107c6c"
@@ -19,6 +20,7 @@ Zygote = "e88e6eb3-aa80-5325-afca-941959d7151f"
 
 [compat]
 ADTypes = "1.22.0"
+ColorSchemes = "3.31.0"
 Enzyme = "0.13.152"
 LinearAlgebra = "1.12.0"
 NLSolversBase = "8.0.0"
