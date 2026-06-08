@@ -41,8 +41,12 @@ t_bounds_left = [it for it in 2:Nt]
 t_bounds_right = [it for it in 2:Nt]
 t_fixed_indicies = [t_t0; t_bounds_left; t_bounds_right]
 
+max_iterations = 100
+
+p_extra = (dx, dt, x, t)
+
 u_size_x = Nx
 
-u = odil_gauss_newton(lhs!, rhs!, p_lhs, p_rhs, u_size_x, u_fixed_vals, x_fixed_indicies, t_fixed_indicies, Nt)
+u = odil_gauss_newton(lhs!, rhs!, p_lhs, p_rhs, u_size_x, u_fixed_vals, x_fixed_indicies, t_fixed_indicies, Nt, max_iterations, extra, p_extra)
 
 plot_2d(x, t, u)

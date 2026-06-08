@@ -1,17 +1,18 @@
 using SciMLBase, OptimizationBase, OptimizationOptimJL, ADTypes, Enzyme, LinearAlgebra
 
-function odil_lbfgs(lhs, rhs, p_lhs, p_rhs, u_size_x, u_fixed_vals, x_fixed_indicies, t_fixed_indicies, Nt = 1000)
+function odil_lbfgs(lhs, rhs, p_lhs, p_rhs, u_size_x, u_fixed_vals, x_fixed_indicies, t_fixed_indicies, Nt = 1000, extra = nothing,  p_extra = nothing)
     space_dims = u_size_x
     num_cells = prod(space_dims)
     num_unknowns = num_cells * Nt
-    
+    iter = Ref(0)
     u_iter0 = zeros(num_unknowns)
 
-    p_all = (p_rhs, p_lhs, u_fixed_vals, x_fixed_indicies, t_fixed_indicies, space_dims, num_unknowns, Nt)
+    p_all = (lhs, rhs, extra, p_lhs, p_rhs, p_extra, u_fixed_vals, x_fixed_indicies, t_fixed_indicies, space_dims, num_unknowns, Nt, iter)
 
     function loss(u_vec, p)
-        p_rhs_inner, p_lhs_inner, u_fixed_vals_inner, x_fixed_indicies_inner, t_fixed_indicies_inner, space_dims_inner, num_unknowns_inner, Nt_inner = p
-        
+        lhs_inner, rhs_inner, extra_inner, p_lhs_inner, p_rhs_inner, p_extra_inner, u_fixed_vals_inner, x_fixed_indicies_inner, t_fixed_indicies_inner, space_dims_inner, num_unknowns_inner, Nt_inner, iter_inner = p
+        iter_inner[] += 1
+
         u_local = reshape(u_vec, space_dims_inner..., Nt_inner)
         
         l_exact = zero(eltype(u_vec))
@@ -29,15 +30,28 @@ function odil_lbfgs(lhs, rhs, p_lhs, p_rhs, u_size_x, u_fixed_vals, x_fixed_indi
             fill!(du_rhs, 0.0)
             fill!(du_lhs, 0.0)
             
-            rhs(du_rhs, u_local, p_rhs_inner, it)
-            lhs(du_lhs, u_local, p_lhs_inner, it)
+            rhs_inner(du_rhs, u_local, p_rhs_inner, it)
+            lhs_inner(du_lhs, u_local, p_lhs_inner, it)
             
             for i in eachindex(du_rhs)
                 l_pde += (du_rhs[i] - du_lhs[i])^2
             end
         end
 
-        l = l_exact + l_pde
+        l_extra = zero(eltype(u_vec))
+
+        if extra_inner !== nothing && p_extra_inner !== nothing
+            for it in 1:(Nt_inner - 1)
+                du_extra = similar(u_local)
+                fill!(du_extra, 0.0)
+                extra_inner(du_extra, u_local, p_extra_inner, it, iter_inner[])
+                for i in eachindex(du_extra)
+                    l_extra += abs(du_extra[i])
+                end
+            end
+        end
+
+        l = l_exact + l_pde + l_extra
 
         return l
     end
