@@ -47,30 +47,21 @@ function odil_lbfgs(lhs, rhs, p_lhs, p_rhs, u_size_x, u_fixed_vals, x_fixed_indi
     # opt = LBFGS(m = 50)
     opt = LBFGS()
 
-    counter = 0
     callback = function (state, l)
-        counter += 1
-        if counter % 1000 == 0 || counter == 1
-            println("Iteration ", counter, ": Loss = ", l)
+        if state.iter % 1000 == 0 || state.iter == 1
+            println("Iteration ", state.iter, ": Loss = ", l)
 
-            u_current = zeros(space_dims..., Nt)
-            for i in 1:length(state.u)
-                u_current[i] = state.u[i]
-            end
+            u_current = reshape(state.u, space_dims..., Nt)
             # plot_comparison(x, t, u_exact, u_current)
             plot_2d(x, t, u_current)
         end
-        return false # false = Optimierung weiterlaufen lassen
+        return false
     end
     
     println("Starte Lösung...")
     res = solve(prob, opt, maxiters = 10000000, callback = callback)
     
-    # Ergebnis für den Output wieder rekonstruieren
-    u_final = zeros(space_dims..., Nt)
-    for i in 1:length(res.u)
-        u_final[i] = res.u[i]
-    end
+    u_final = reshape(res.u, space_dims..., Nt)
     println("Optimierung beendet!")
     println("Return Code: ", res.retcode)
     return u_final

@@ -45,30 +45,37 @@ function odil_gauss_newton(lhs, rhs, p_lhs, p_rhs, u_size_x, u_fixed_vals, x_fix
     prob = NonlinearLeastSquaresProblem(operator_loss, u_iter0, p_all)
     opt = GaussNewton(autodiff = AutoEnzyme())
 
-    counter = 0
-    callback = function (state, l)
-        counter += 1
-        if counter % 1000 == 0 || counter == 1
-            println("Iteration ", counter, ": Loss = ", norm(l))
-
-            u_current = zeros(space_dims..., Nt)
-            for i in 1:length(state.u)
-                u_current[i] = state.u[i]
-            end
-            plot_comparison(x, t, u_exact, u_current)
-        end
+    callback = function (cache, iter)
+        println("Iteration ", iter, ": Loss = ", norm(cache.fu))
+        u_current = reshape(cache.u, space_dims..., Nt)
+        plot_2d(x, t, u_current)
         return false # false = Optimierung weiterlaufen lassen
     end
     
     println("Starte Lösung...")
-    res = solve(prob, opt, maxiters = 2, callback = callback)
     
-    # Ergebnis für den Output wieder rekonstruieren
-    u_final = zeros(space_dims..., Nt)
-    for i in 1:length(res.u)
-        u_final[i] = res.u[i]
+    max_iterations = 15
+    cache = init(prob, opt, maxiters = max_iterations)
+    
+    for iter in 1:max_iterations
+        step!(cache)
+        
+        current_loss = norm(cache.fu)
+        println("Iteration ", iter, ": Loss = ", current_loss)
+
+        u_current = reshape(cache.u, space_dims..., Nt)
+        
+        plot_2d(x, t, u_current)
+        
+        if cache.retcode != SciMLBase.ReturnCode.Default
+            break
+        end
     end
+    
+    # 3. Final reconstruction
+    u_final = reshape(cache.u, space_dims..., Nt)
+    
     println("Optimierung beendet!")
-    println("Return Code: ", res.retcode)
+    println("Return Code: ", cache.retcode)
     return u_final
 end
