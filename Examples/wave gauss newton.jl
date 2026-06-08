@@ -4,7 +4,7 @@ Pkg.add("SciMLBase")
 Pkg.add("NonlinearSolveFirstOrder")
 Pkg.add("ADTypes")
 Pkg.add("Enzyme")
-include("../src/FD/wave.jl")
+include("../src/semidiscretization/wave.jl")
 include("../src/solvers/odil_gauss_newton.jl")
 
 Nx = 32

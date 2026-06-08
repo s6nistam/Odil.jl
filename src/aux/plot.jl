@@ -22,3 +22,26 @@ display(p)
 # png(p, "simulation_result.png")
 
 end
+
+function plot_2d(x, t, u;
+    save_file = false)
+
+# We determine the min and max values to ensure both plots share the same color scale
+z_min = minimum(u)
+z_max = maximum(u)
+
+# Create the plot
+# Note: If your data is u[time, space], add a transpose like: u_exact'
+p = plot(
+    heatmap(x, t, u',  xlabel="x", ylabel="t", clims=(z_min, z_max)),
+    size = (400, 400),         # Resolution
+    c = :viridis               # Color map (optional)
+)
+
+# Display the plot
+display(p)
+
+# Optional: Save to file
+# png(p, "simulation_result.png")
+
+end

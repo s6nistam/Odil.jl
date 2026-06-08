@@ -61,7 +61,8 @@ function odil_lbfgs(lhs, rhs, p_lhs, p_rhs, u_t0, Nt = 1000)
             for i in 1:length(state.u)
                 u_current[i] = state.u[i]
             end
-            plot_comparison(x, t, u_exact, u_current)
+            # plot_comparison(x, t, u_exact, u_current)
+            plot_2d(x, t, u_current)
         end
         return false # false = Optimierung weiterlaufen lassen
     end

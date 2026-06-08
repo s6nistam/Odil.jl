@@ -5,7 +5,7 @@ Pkg.add("OptimizationBase")
 Pkg.add("OptimizationOptimJL")
 Pkg.add("ADTypes")
 Pkg.add("Enzyme")
-include("../src/FD/wave.jl")
+include("../src/semidiscretization/wave.jl")
 include("../src/solvers/odil_lbfgs.jl")
 
 Nx = 32
