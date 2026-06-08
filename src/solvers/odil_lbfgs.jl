@@ -1,27 +1,23 @@
 using SciMLBase, OptimizationBase, OptimizationOptimJL, ADTypes, Enzyme, LinearAlgebra
 
-function odil_lbfgs(lhs, rhs, p_lhs, p_rhs, u_size_x, u_exact_vals, Nt = 1000)
+function odil_lbfgs(lhs, rhs, p_lhs, p_rhs, u_size_x, u_fixed_vals, x_fixed_indicies, t_fixed_indicies, Nt = 1000)
     space_dims = u_size_x
     num_cells = prod(space_dims)
     num_unknowns = num_cells * Nt
     
     u_iter0 = zeros(num_unknowns)
 
-    p_all = (p_rhs, p_lhs, u_exact_vals, space_dims, num_unknowns, Nt)
+    p_all = (p_rhs, p_lhs, u_fixed_vals, x_fixed_indicies, t_fixed_indicies, space_dims, num_unknowns, Nt)
 
     function loss(u_vec, p)
-        p_rhs_inner, p_lhs_inner, u_exact_vals_inner, space_dims_inner, num_unknowns_inner, Nt_inner = p
+        p_rhs_inner, p_lhs_inner, u_fixed_vals_inner, x_fixed_indicies_inner, t_fixed_indicies_inner, space_dims_inner, num_unknowns_inner, Nt_inner = p
         
-        u_local = zeros(eltype(u_vec), space_dims_inner..., Nt)
-        
-        for i in 1:num_unknowns_inner
-            u_local[i] = u_vec[i]
-        end
+        u_local = reshape(u_vec, space_dims_inner..., Nt_inner)
         
         l_exact = zero(eltype(u_vec))
 
-        for (u_val, ix, it) in u_exact_vals_inner
-            l_exact += (num_unknowns_inner/length(u_exact_vals_inner))^2 *(u_local[ix..., it] - u_val)^2
+        for (u_val, ix, it) in zip(u_fixed_vals_inner, x_fixed_indicies_inner, t_fixed_indicies_inner)
+            l_exact += (num_unknowns_inner/length(u_fixed_vals_inner))^2 *(u_local[ix..., it] - u_val)^2
         end
 
         l_pde = zero(eltype(u_vec))
