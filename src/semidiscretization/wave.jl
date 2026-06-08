@@ -49,9 +49,9 @@ function lhs!(du, u, p, it)
         end
     end
 
-    penalty_bc = Nx/2
-    du[1]  = penalty_bc * (u[1, it + 1] - get_exact_wave(x[1], t[it + 1]))
-    du[Nx] = penalty_bc * (u[Nx, it + 1] - get_exact_wave(x[Nx], t[it + 1]))
+    # penalty_bc = Nx/2
+    # du[1]  = penalty_bc * (u[1, it + 1] - get_exact_wave(x[1], t[it + 1]))
+    # du[Nx] = penalty_bc * (u[Nx, it + 1] - get_exact_wave(x[Nx], t[it + 1]))
     
     return nothing
 end
