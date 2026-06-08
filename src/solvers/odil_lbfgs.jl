@@ -7,10 +7,10 @@ function odil_lbfgs(lhs, rhs, p_lhs, p_rhs, u_size_x, u_exact_vals, Nt = 1000)
     
     u_iter0 = zeros(num_unknowns)
 
-    p_all = (p_rhs, p_lhs, u_exact_vals, space_dims, num_cells, num_unknowns, Nt)
+    p_all = (p_rhs, p_lhs, u_exact_vals, space_dims, num_unknowns, Nt)
 
     function loss(u_vec, p)
-        p_rhs_inner, p_lhs_inner, u_exact_vals_inner, space_dims_inner, num_cells_inner, num_unknowns_inner, Nt_inner = p
+        p_rhs_inner, p_lhs_inner, u_exact_vals_inner, space_dims_inner, num_unknowns_inner, Nt_inner = p
         
         u_local = zeros(eltype(u_vec), space_dims_inner..., Nt)
         
@@ -21,7 +21,7 @@ function odil_lbfgs(lhs, rhs, p_lhs, p_rhs, u_size_x, u_exact_vals, Nt = 1000)
         l_exact = zero(eltype(u_vec))
 
         for (u_val, ix, it) in u_exact_vals_inner
-            l_exact += (num_unknowns_inner/length(u_exact_vals))^2 *(u_local[ix..., it] - u_val)^2
+            l_exact += (num_unknowns_inner/length(u_exact_vals_inner))^2 *(u_local[ix..., it] - u_val)^2
         end
 
         l_pde = zero(eltype(u_vec))
