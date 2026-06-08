@@ -60,12 +60,7 @@ function odil_gauss_newton(lhs, rhs, p_lhs, p_rhs, u_size_x, u_fixed_vals, x_fix
     for iter in 1:max_iterations
         step!(cache)
         
-        current_loss = norm(cache.fu)
-        println("Iteration ", iter, ": Loss = ", current_loss)
-
-        u_current = reshape(cache.u, space_dims..., Nt)
-        
-        plot_2d(x, t, u_current)
+        callback(cache, iter)
         
         if cache.retcode != SciMLBase.ReturnCode.Default
             break
