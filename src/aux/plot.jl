@@ -11,8 +11,8 @@ z_max = max(maximum(u_exact), maximum(u_approx))
 # Create the plot
 # Note: If your data is u[time, space], add a transpose like: u_exact'
 p = plot(
-    heatmap(x, t, u_exact',    title="Exact Solution", xlabel="x", ylabel="t", clims=(z_min, z_max), c = :viridis),
-    heatmap(x, t, u_approx',   title="Approximation",  xlabel="x", ylabel="t", clims=(z_min, z_max), c = :viridis),
+    heatmap(x, t, u_exact',    title="Exact Solution", xlabel="x", ylabel="t", clims=(z_min - 1e-16, z_max + 1e-16), c = :viridis),
+    heatmap(x, t, u_approx',   title="Approximation",  xlabel="x", ylabel="t", clims=(z_min - 1e-16, z_max + 1e-16), c = :viridis),
     layout = (1, 2),           # 1 row, 2 columns
     size = (800, 400),         # Resolution
     c = :viridis               # Color map (optional)
@@ -36,7 +36,7 @@ z_max = maximum(u)
 # Create the plot
 # Note: If your data is u[time, space], add a transpose like: u_exact'
 p = plot(
-    heatmap(x, t, u',  xlabel="x", ylabel="t", clims=(z_min, z_max), c = :viridis),
+    heatmap(x, t, u',  xlabel="x", ylabel="t", clims=(z_min - 1e-16, z_max + 1e-16), c = :viridis),
     size = (400, 400),         # Resolution
     c = :viridis               # Color map (optional)
 )
