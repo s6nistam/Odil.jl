@@ -1,11 +1,13 @@
 using SciMLBase, NonlinearSolveFirstOrder, ADTypes, Enzyme, LinearAlgebra
 
-function odil_gauss_newton(lhs, rhs, p_lhs, p_rhs, u_size_x, u_fixed_vals, x_fixed_indicies, t_fixed_indicies, Nt = 1000, max_iterations = 2, extra = nothing,  p_extra = nothing)
+function odil_gauss_newton(lhs, rhs, p_lhs, p_rhs, u_size_x, u_fixed_vals, x_fixed_indicies, t_fixed_indicies, Nt = 1000; max_iterations = 2, extra = nothing,  p_extra = nothing, u_iter0 = nothing)
     space_dims = u_size_x
     num_cells = prod(space_dims)
     num_unknowns = num_cells * Nt
     p_iter = Ref(0)
-    u_iter0 = zeros(num_unknowns)
+    if u_iter0 === nothing
+        u_iter0 = zeros(num_unknowns)
+    end
 
     p_all = (lhs, rhs, extra, p_lhs, p_rhs, p_extra, u_fixed_vals, x_fixed_indicies, t_fixed_indicies, space_dims, num_cells, num_unknowns, Nt, p_iter)
 

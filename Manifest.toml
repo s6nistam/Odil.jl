@@ -2,7 +2,7 @@
 
 julia_version = "1.12.6"
 manifest_format = "2.0"
-project_hash = "06b5d27d324d1f8cc7738935730be63d80cc5abd"
+project_hash = "8b2957963a79dd8043b202ed837603f61daa55b2"
 
 [[deps.ADTypes]]
 git-tree-sha1 = "bbc22a9a08a0ef6460041086d8a7b27940ed4ffd"
@@ -55,14 +55,11 @@ deps = ["LinearAlgebra"]
 git-tree-sha1 = "28e1637322d4019ed2577cbec9268fab9b7da117"
 uuid = "79e6a3ab-5dfb-504d-930d-738a2a938a0e"
 version = "4.6.0"
+weakdeps = ["SparseArrays", "StaticArrays"]
 
     [deps.Adapt.extensions]
     AdaptSparseArraysExt = "SparseArrays"
     AdaptStaticArraysExt = "StaticArrays"
-
-    [deps.Adapt.weakdeps]
-    SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
-    StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 
 [[deps.AliasTables]]
 deps = ["PtrArrays", "Random"]
@@ -470,18 +467,13 @@ deps = ["LinearAlgebra"]
 git-tree-sha1 = "2f979084d1e13948a3352cf64a25df6bd3b4dca3"
 uuid = "1a297f60-69ca-5386-bcde-b61e274b549b"
 version = "1.16.0"
+weakdeps = ["PDMats", "SparseArrays", "StaticArrays", "Statistics"]
 
     [deps.FillArrays.extensions]
     FillArraysPDMatsExt = "PDMats"
     FillArraysSparseArraysExt = "SparseArrays"
     FillArraysStaticArraysExt = "StaticArrays"
     FillArraysStatisticsExt = "Statistics"
-
-    [deps.FillArrays.weakdeps]
-    PDMats = "90014a1f-27ba-587c-ab20-58faa44d9150"
-    SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
-    StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
-    Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
 [[deps.FiniteDiff]]
 deps = ["ArrayInterface", "LinearAlgebra", "Setfield"]
@@ -500,6 +492,12 @@ version = "2.31.0"
     BlockBandedMatrices = "ffab5731-97b5-5995-9138-79e8c1846df0"
     SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
     StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
+
+[[deps.FiniteDifferences]]
+deps = ["ChainRulesCore", "LinearAlgebra", "Printf", "Random", "Richardson", "SparseArrays", "StaticArrays"]
+git-tree-sha1 = "9321ce3c7720252efe0d2a8046c9a4498a5c9880"
+uuid = "26cc04aa-876d-5657-8c51-4c34ba976000"
+version = "0.12.34"
 
 [[deps.FixedPointNumbers]]
 deps = ["Statistics"]
@@ -523,12 +521,10 @@ deps = ["CommonSubexpressions", "DiffResults", "DiffRules", "LinearAlgebra", "Lo
 git-tree-sha1 = "cddeab6487248a39dae1a960fff0ac17b2a28888"
 uuid = "f6369f11-7733-5829-9624-2563aa707210"
 version = "1.3.3"
+weakdeps = ["StaticArrays"]
 
     [deps.ForwardDiff.extensions]
     ForwardDiffStaticArraysExt = "StaticArrays"
-
-    [deps.ForwardDiff.weakdeps]
-    StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 
 [[deps.FreeType2_jll]]
 deps = ["Artifacts", "Bzip2_jll", "JLLWrappers", "Libdl", "Zlib_jll"]
@@ -1106,7 +1102,7 @@ uuid = "d8793406-e978-5875-9003-1fc021f44a92"
 version = "0.5.0"
 
 [[deps.Odil]]
-deps = ["ADTypes", "ColorSchemes", "Enzyme", "LinearAlgebra", "NLSolversBase", "NonlinearSolveFirstOrder", "Optim", "OptimizationBase", "OptimizationLBFGSB", "OptimizationOptimJL", "Plots", "SciMLBase", "Zygote"]
+deps = ["ADTypes", "ColorSchemes", "Enzyme", "FiniteDifferences", "LinearAlgebra", "NLSolversBase", "NonlinearSolveFirstOrder", "Optim", "OptimizationBase", "OptimizationLBFGSB", "OptimizationOptimJL", "Plots", "SciMLBase", "Zygote"]
 path = "."
 uuid = "c15e9705-4550-4157-9636-e6a06c04b4f1"
 version = "0.1.0-DEV"
@@ -1442,6 +1438,12 @@ git-tree-sha1 = "62389eeff14780bfe55195b7204c0d8738436d64"
 uuid = "ae029012-a4dd-5104-9daa-d747884805df"
 version = "1.3.1"
 
+[[deps.Richardson]]
+deps = ["LinearAlgebra"]
+git-tree-sha1 = "f153282474ad4dc2d3bdebcce810a5e40e757924"
+uuid = "708f8203-808e-40c0-ba2d-98a6953ed40d"
+version = "1.4.3"
+
 [[deps.RuntimeGeneratedFunctions]]
 deps = ["ExprTools", "SHA", "Serialization"]
 git-tree-sha1 = "28154d426e557495aa75097861b18c11f2541ded"
@@ -1645,6 +1647,17 @@ deps = ["Random"]
 git-tree-sha1 = "4f96c596b8c8258cc7d3b19797854d368f243ddc"
 uuid = "860ef19b-820b-49d6-a774-d7a799459cd3"
 version = "1.0.4"
+
+[[deps.StaticArrays]]
+deps = ["LinearAlgebra", "PrecompileTools", "Random", "StaticArraysCore"]
+git-tree-sha1 = "246a8bb2e6667f832eea063c3a56aef96429a3db"
+uuid = "90137ffa-7385-5640-81b9-e52037218182"
+version = "1.9.18"
+weakdeps = ["ChainRulesCore", "Statistics"]
+
+    [deps.StaticArrays.extensions]
+    StaticArraysChainRulesCoreExt = "ChainRulesCore"
+    StaticArraysStatisticsExt = "Statistics"
 
 [[deps.StaticArraysCore]]
 git-tree-sha1 = "6ab403037779dae8c514bad259f32a447262455a"
