@@ -1,7 +1,7 @@
 using SciMLBase, NonlinearSolveFirstOrder, ADTypes, Enzyme, LinearAlgebra
 
 function odil_gauss_newton(lhs, rhs, p_lhs, p_rhs, u_size_x, u_fixed_vals, x_fixed_indicies, t_fixed_indicies, Nt = 1000, max_iterations = 2, extra = nothing,  p_extra = nothing)
-    space_dims = (u_size_x,)
+    space_dims = u_size_x
     num_cells = prod(space_dims)
     num_unknowns = num_cells * Nt
     p_iter = Ref(0)
@@ -17,19 +17,20 @@ function odil_gauss_newton(lhs, rhs, p_lhs, p_rhs, u_size_x, u_fixed_vals, x_fix
         l_exact = zeros(eltype(u_vec), space_dims_inner..., Nt_inner)
 
         for (u_val, ix, it) in zip(u_fixed_vals_inner, x_fixed_indicies_inner, t_fixed_indicies_inner)
-            l_exact[ix..., it] += (num_unknowns_inner/length(u_fixed_vals_inner)) *(u_local[ix..., it] - u_val)
+            l_exact[ix..., it] += (num_unknowns_inner/length(u_fixed_vals_inner)) * (u_local[ix..., it] - u_val)
         end
 
         l_pde = zeros(eltype(u_vec), num_unknowns_inner)
         
-        du_rhs = similar(u_local)
-        du_lhs = similar(u_local)
+        du_rhs = zeros(num_cells_inner)
+        du_lhs = zeros(num_cells_inner)
         
         for it in 1:(Nt_inner - 1)
+            u_rhs = vec(selectdim(u_local, length(space_dims_inner) + 1, it))
             fill!(du_rhs, 0.0)
             fill!(du_lhs, 0.0)
             
-            rhs_inner(du_rhs, u_local, p_rhs_inner, it)
+            rhs_inner(du_rhs, u_rhs, p_rhs_inner, it)
             lhs_inner(du_lhs, u_local, p_lhs_inner, it)
             
             for i in 1:num_cells_inner

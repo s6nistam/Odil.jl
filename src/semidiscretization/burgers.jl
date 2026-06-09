@@ -7,7 +7,7 @@ function rhs!(du, u, p, it)
 
     
     for ix in 2:(Nx-1)
-        du[ix] = - u[ix, it + 1] * (u[ix, it + 1] - u[ix - 1, it + 1]) / dx
+        du[ix] = - u[ix] * (u[ix] - u[ix - 1]) / dx
     end
     
     return nothing
