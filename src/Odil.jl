@@ -1,6 +1,6 @@
 module Odil
 
-using Plots
+using GLMakie
 
 include("aux/plot.jl")
 include("semidiscretization/wave.jl")
