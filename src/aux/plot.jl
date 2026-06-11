@@ -1,50 +1,61 @@
+using GLMakie
 using ColorSchemes
-using Plots
 
 function plot_comparison(x, t, u_exact, u_approx;
-    save_file = false)
+    save_file = false, filename = "comparison.png")
 
-# We determine the min and max values to ensure both plots share the same color scale
-z_min = min(minimum(u_exact), minimum(u_approx))
-z_max = max(maximum(u_exact), maximum(u_approx))
+    # We determine the min and max values to ensure both plots share the same color scale
+    z_min = min(minimum(u_exact), minimum(u_approx))
+    z_max = max(maximum(u_exact), maximum(u_approx))
 
-# Create the plot
-# Note: If your data is u[time, space], add a transpose like: u_exact'
-p = plot(
-    heatmap(x, t, u_exact',    title="Exact Solution", xlabel="x", ylabel="t", clims=(z_min - 1e-16, z_max + 1e-16), c = :viridis),
-    heatmap(x, t, u_approx',   title="Approximation",  xlabel="x", ylabel="t", clims=(z_min - 1e-16, z_max + 1e-16), c = :viridis),
-    layout = (1, 2),           # 1 row, 2 columns
-    size = (800, 400),         # Resolution
-    c = :viridis               # Color map (optional)
-)
+    # Create a new figure
+    fig = Figure(size = (800, 400))
 
-# Display the plot
-display(p)
+    # Add heatmaps to the figure
+    ax1 = Axis(fig[1, 1], title = "Exact Solution", xlabel = "x", ylabel = "t")
+    hm1 = heatmap!(ax1, x, t, u_exact, colorrange = (z_min, z_max), colormap = :viridis)
 
-# Optional: Save to file
-# png(p, "simulation_result.png")
+    ax2 = Axis(fig[1, 2], title = "Approximation", xlabel = "x", ylabel = "t")
+    hm2 = heatmap!(ax2, x, t, u_approx, colorrange = (z_min, z_max), colormap = :viridis)
 
+    # Add a colorbar
+    Colorbar(fig[1, 3], hm1, label = "Value")
+
+    # Display the figure
+    display(fig)
+
+    # Optional: Save to file
+    if save_file
+        save(filename, fig)
+    end
+
+    return fig
 end
 
 function plot_2d(x, t, u;
-    save_file = false)
+    save_file = false, filename = "solution.png")
 
-# We determine the min and max values to ensure both plots share the same color scale
-z_min = minimum(u)
-z_max = maximum(u)
+    # We determine the min and max values
+    z_min = minimum(u)
+    z_max = maximum(u)
 
-# Create the plot
-# Note: If your data is u[time, space], add a transpose like: u_exact'
-p = plot(
-    heatmap(x, t, u',  xlabel="x", ylabel="t", clims=(z_min - 1e-16, z_max + 1e-16), c = :viridis),
-    size = (400, 400),         # Resolution
-    c = :viridis               # Color map (optional)
-)
+    # Create a new figure
+    fig = Figure(size = (400, 400))
 
-# Display the plot
-display(p)
+    # Add heatmap to the figure
+    ax = Axis(fig[1, 1], xlabel = "x", ylabel = "t")
+    hm = heatmap!(ax, x, t, u, colorrange = (z_min, z_max), colormap = :viridis)
 
-# Optional: Save to file
-# png(p, "simulation_result.png")
+    # Add a colorbar
+    Colorbar(fig[1, 2], hm, label = "Value")
 
+    # Display the figure
+    display(fig)
+
+    # Optional: Save to file
+    if save_file
+        save(filename, fig)
+    end
+
+    return fig
 end
