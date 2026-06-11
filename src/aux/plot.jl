@@ -59,3 +59,187 @@ function plot_2d(x, t, u;
 
     return fig
 end
+
+function plot_2d_time(x, y, u;
+    save_file = false, filename = "solution.png")
+
+    # We determine the min and max values
+    z_min = minimum(u)
+    z_max = maximum(u)
+
+    # Create a new figure
+    fig = Figure(size = (400, 400))
+    it = Observable(1)
+    u_it = @lift(u[:, :, $it])
+    # Add heatmap to the figure
+    ax = Axis(fig[1, 1], xlabel = "x", ylabel = "y")
+    hm = heatmap!(ax, x, y, u_it, colorrange = (z_min, z_max), colormap = :viridis)
+
+    # Add a colorbar
+    Colorbar(fig[1, 2], hm, label = "Value")
+
+
+    sg = SliderGrid(fig[2, 1],
+        (label = "Time Step", range = 1:size(u, 3), startvalue = 1))
+    
+    # Link slider to the Observable
+    on(sg.sliders[1].value) do val
+        it[] = val
+        ax.title = "Time index: $val" # Update title dynamically
+    end
+
+    # Display the figure
+    display(fig)
+
+    # Optional: Save to file
+    if save_file
+        save(filename, fig)
+    end
+
+    return fig
+end
+
+
+function interpolate_to_equidistant(x, y, z, u)
+    # Define the new equidistant grid
+    nx, ny, nz = size(u, 1), size(u, 2), size(u, 3)
+    x_new = range(minimum(x), maximum(x), length=nx)
+    y_new = range(minimum(y), maximum(y), length=ny)
+    z_new = range(minimum(z), maximum(z), length=nz)
+
+    u_out = zeros(nx, ny, nz)
+    
+    for i in 1:nx, j in 1:ny, k in 1:nz
+        xi, yi, zi = x_new[i], y_new[j], z_new[k]
+
+        ref_i = searchsortedlast(x[:, 1, 1], xi)
+        ref_j = searchsortedlast(y[1, :, 1], yi)
+        ref_k = searchsortedlast(z[1, 1, :], zi)
+        ref_ip = min(searchsortedlast(x[:, 1, 1], xi)+ 1, nx)
+        ref_jp = min(searchsortedlast(y[1, :, 1], yi)+ 1, ny)
+        ref_kp = min(searchsortedlast(z[1, 1, :], zi)+ 1, nz)
+        xn = x[ref_i, ref_j, ref_k]
+        yn = y[ref_i, ref_j, ref_k]
+        zn = z[ref_i, ref_j, ref_k]
+
+        # 2. Get relative distances (normalized 0 to 1)
+        xd = (xi - xn) / (x[ref_ip, ref_j, ref_k] - xn)
+        yd = (yi - yn) / (y[ref_i, ref_jp, ref_k] - yn)
+        zd = (zi - zn) / (z[ref_i, ref_j, ref_kp] - zn)
+        
+        # 3. Perform trilinear interpolation
+        # Extract the 8 surrounding corner values
+        c000 = u[ref_i,   ref_j,   ref_k]
+        c100 = u[ref_ip, ref_j,   ref_k]
+        c010 = u[ref_i,   ref_jp,  ref_k]
+        c110 = u[ref_ip, ref_jp,  ref_k]
+        c001 = u[ref_i,   ref_j,   ref_kp]
+        c101 = u[ref_ip, ref_j,   ref_kp]
+        c011 = u[ref_i,   ref_jp,  ref_kp]
+        c111 = u[ref_ip, ref_jp,  ref_kp]
+        
+        # Interpolate along x
+        c00 = ref_i != ref_ip ? c000 * (1 - xd) + c100 * xd : c000
+        c01 = ref_i != ref_ip ? c001 * (1 - xd) + c101 * xd : c001
+        c10 = ref_i != ref_ip ? c010 * (1 - xd) + c110 * xd : c010
+        c11 = ref_i != ref_ip ? c011 * (1 - xd) + c111 * xd : c011
+        
+        # Interpolate along y
+        c0 = ref_j != ref_jp ? c00 * (1 - yd) + c10 * yd : c00
+        c1 = ref_j != ref_jp ? c01 * (1 - yd) + c11 * yd : c01
+        
+        # Interpolate along z
+        u_out[i, j, k] = ref_k != ref_kp ? c0 * (1 - zd) + c1 * zd : c0
+    end
+    
+    return x_new, y_new, z_new, u_out
+end
+
+# function interpolate_to_equidistant(x::AbstractVector, y::AbstractVector, z::AbstractVector, u::AbstractArray{<:Any, 3})
+#     # 1. Ensure knots are in a tuple
+#     knots = (x, y, z)
+    
+#     # 2. Construct the interpolator
+#     # Gridded(Linear()) is correct for non-equidistant structured grids
+#     itp = interpolate(knots, u, Gridded(Linear()))
+
+#     # 3. Define the new equidistant grid 
+#     # Use range() to ensure floating point precision
+#     new_x = range(first(x), last(x), length=length(x))
+#     new_y = range(first(y), last(y), length=length(y))
+#     new_z = range(first(z), last(z), length=length(z))
+
+#     # 4. Interpolate onto the new grid
+#     # We use broadcasting (itp.(...)) for performance
+#     u_equidistant = [itp(xi, yi, zi) for xi in new_x, yi in new_y, zi in new_z]
+
+#     return new_x, new_y, new_z, u_equidistant
+# end
+
+function plot_fe_3d_time(x, y, z, e, u;
+    save_file = false, filename = "solution.png")
+
+    # Create a new figure
+    fig = Figure(size = (400, 400))
+    it = Observable(1)
+    ax = Axis3(fig[1, 1], xlabel = "x", ylabel = "y", zlabel = "z")
+
+    # We determine the min and max values
+    c_min = minimum(u)
+    c_max = maximum(u)
+
+    for element in e
+        ue = u[:, :, :, element, :]
+        xe = x[:, :, :, element]
+        ye = y[:, :, :, element]
+        ze = z[:, :, :, element]
+
+        # 1. Calculate the spatial grid bounds ONCE (using t=1 as a dummy)
+        # We only need x_eq, y_eq, z_eq; they don't change with time.
+        x_eq, y_eq, z_eq, _ = interpolate_to_equidistant(xe, ye, ze, ue[:, :, :, 1])
+
+        # 2. Lift the interpolation logic. 
+        # Whenever `it` changes, this block re-runs and generates a new u_out array.
+        u_eq_obs = lift(it) do current_t
+            # Extract current slice
+            u_slice = ue[:, :, :, current_t]
+            # Interpolate and return ONLY the u_out part
+            _, _, _, u_out = interpolate_to_equidistant(xe, ye, ze, u_slice)
+            return u_out
+        end
+
+        # 3. Pass the observable (u_eq_obs) directly to volume!
+        hm_e = volume!(ax, 
+            (x_eq[1], x_eq[end]), 
+            (y_eq[1], y_eq[end]), 
+            (z_eq[1], z_eq[end]), 
+            u_eq_obs, # <- Observable passed here!
+            colorrange = (c_min, c_max), 
+            colormap = :viridis, 
+            algorithm = :mip, 
+            transparency = true
+        )
+    end
+        # Add a colorbar
+        Colorbar(fig[1, 2], limits=(c_min, c_max), label = "Value")
+
+
+    sg = SliderGrid(fig[2, 1],
+        (label = "Time Step", range = 1:size(u, 5), startvalue = 1))
+    
+    # Link slider to the Observable
+    on(sg.sliders[1].value) do val
+        it[] = val
+        ax.title = "Time index: $val" # Update title dynamically
+    end
+
+    # Display the figure
+    display(fig)
+
+    # Optional: Save to file
+    if save_file
+        save(filename, fig)
+    end
+
+    return fig
+end
