@@ -177,7 +177,7 @@ end
 # end
 
 function plot_fe_3d_time(x, y, z, e, u;
-    save_file = false, filename = "solution.png")
+    save_file = false, filename = "solution.png", c_min = nothing, c_max = nothing)
 
     # Create a new figure
     fig = Figure(size = (400, 400))
@@ -185,8 +185,12 @@ function plot_fe_3d_time(x, y, z, e, u;
     ax = Axis3(fig[1, 1], xlabel = "x", ylabel = "y", zlabel = "z")
 
     # We determine the min and max values
-    c_min = minimum(u)
-    c_max = maximum(u)
+    if c_min === nothing
+        c_min = minimum(u)
+    end
+    if c_max === nothing
+        c_max = maximum(u)
+    end
 
     for element in e
         ue = u[:, :, :, element, :]
