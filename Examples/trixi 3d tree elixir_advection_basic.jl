@@ -75,4 +75,4 @@ t = sol.t
 # 2. reduce(hcat, ...) stacks these time steps side-by-side into a single 2D Matrix.
 u_matrix = reduce(hcat, vec.(sol.u))
 u = reshape(u_matrix, 4, 4, 4, (2^refinement_level)^3, length(t))
-plot_fe_3d_time(x, y, z, e, u)
+plot_fe_3d_time(x, y, z, e, u, c_min = 0.0, c_max = 1.5)
