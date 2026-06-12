@@ -221,7 +221,8 @@ function plot_fe_3d_time(x, y, z, e, u;
             colorrange = (c_min, c_max), 
             colormap = :viridis, 
             algorithm = :mip, 
-            transparency = true
+            transparency = true, 
+            interpolate = true
         )
     end
         # Add a colorbar
@@ -235,6 +236,100 @@ function plot_fe_3d_time(x, y, z, e, u;
     on(sg.sliders[1].value) do val
         it[] = val
         ax.title = "Time index: $val" # Update title dynamically
+    end
+
+    # Display the figure
+    display(fig)
+
+    # Optional: Save to file
+    if save_file
+        save(filename, fig)
+    end
+
+    return fig
+end
+
+function plot_fe_3d_time_compare(x, y, z, e, u_exact, u_approx;
+    save_file = false, filename = "solution.png", c_min = nothing, c_max = nothing)
+
+    # Create a new figure
+    fig = Figure(size = (400, 400))
+    it = Observable(1)
+    ax_exact = Axis3(fig[1, 1], xlabel = "x", ylabel = "y", zlabel = "z", title = "Exact Solution")
+    ax_approx = Axis3(fig[1, 2], xlabel = "x", ylabel = "y", zlabel = "z", title = "Approximate Solution")
+
+    # We determine the min and max values
+    if c_min === nothing
+        c_min = minimum(u_exact)
+    end
+    if c_max === nothing
+        c_max = maximum(u_exact)
+    end
+
+    for element in e
+        ue_exact = u_exact[:, :, :, element, :]
+        ue_approx = u_approx[:, :, :, element, :]
+        xe = x[:, :, :, element]
+        ye = y[:, :, :, element]
+        ze = z[:, :, :, element]
+
+        # 1. Calculate the spatial grid bounds ONCE (using t=1 as a dummy)
+        # We only need x_eq, y_eq, z_eq; they don't change with time.
+        x_eq, y_eq, z_eq, _ = interpolate_to_equidistant(xe, ye, ze, ue_exact[:, :, :, 1])
+
+        # 2. Lift the interpolation logic. 
+        # Whenever `it` changes, this block re-runs and generates a new u_out array.
+        u_eq_exact_obs = lift(it) do current_t
+            # Extract current slice
+            u_slice_exact = ue_exact[:, :, :, current_t]
+            # Interpolate and return ONLY the u_out part
+            _, _, _, u_out_exact = interpolate_to_equidistant(xe, ye, ze, u_slice_exact)
+            return u_out_exact
+        end
+
+        u_eq_approx_obs = lift(it) do current_t
+            # Extract current slice
+            u_slice_approx = ue_approx[:, :, :, current_t]
+            # Interpolate and return ONLY the u_out part
+            _, _, _, u_out_approx = interpolate_to_equidistant(xe, ye, ze, u_slice_approx)
+            return u_out_approx
+        end
+
+        # 3. Pass the observable (u_eq_obs) directly to volume!
+        hm_e_exact = volume!(ax_exact, 
+            (x_eq[1], x_eq[end]), 
+            (y_eq[1], y_eq[end]), 
+            (z_eq[1], z_eq[end]), 
+            u_eq_exact_obs, # <- Observable passed here!
+            colorrange = (c_min, c_max), 
+            colormap = :viridis, 
+            algorithm = :mip, 
+            transparency = true, 
+            interpolate = true
+        )
+
+        hm_e_approx = volume!(ax_approx, 
+            (x_eq[1], x_eq[end]), 
+            (y_eq[1], y_eq[end]), 
+            (z_eq[1], z_eq[end]), 
+            u_eq_approx_obs, # <- Observable passed here!
+            colorrange = (c_min, c_max), 
+            colormap = :viridis, 
+            algorithm = :mip, 
+            transparency = true, 
+            interpolate = true
+        )
+    end
+        # Add a colorbar
+        Colorbar(fig[1, 3], limits=(c_min, c_max), label = "Value")
+
+
+    sg = SliderGrid(fig[2, :],
+        (label = "Time Step", range = 1:size(u_exact, 5), startvalue = 1))
+    
+    # Link slider to the Observable
+    on(sg.sliders[1].value) do val
+        it[] = val
     end
 
     # Display the figure
