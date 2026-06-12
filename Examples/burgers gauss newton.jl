@@ -1,12 +1,12 @@
 using Odil
 import Pkg
-Pkg.add("SciMLBase")
-Pkg.add("OptimizationBase")
-Pkg.add("OptimizationOptimJL")
-Pkg.add("ADTypes")
-Pkg.add("Enzyme")
-Pkg.add("ColorSchemes")
-Pkg.add("Plots")
+# Pkg.add("SciMLBase")
+# Pkg.add("OptimizationBase")
+# Pkg.add("OptimizationOptimJL")
+# Pkg.add("ADTypes")
+# Pkg.add("Enzyme")
+# Pkg.add("ColorSchemes")
+# Pkg.add("Plots")
 include("../src/semidiscretization/burgers.jl")
 include("../src/references/burgers.jl")
 include("../src/solvers/odil_gauss_newton.jl")
@@ -47,6 +47,6 @@ p_extra = (dx, dt, x, t)
 
 u_size_x = Nx
 
-u = odil_gauss_newton(lhs!, rhs!, p_lhs, p_rhs, u_size_x, u_fixed_vals, x_fixed_indicies, t_fixed_indicies, Nt, max_iterations, extra, p_extra)
+u = odil_gauss_newton(lhs!, rhs!, p_lhs, p_rhs, u_size_x, u_fixed_vals, x_fixed_indicies, t_fixed_indicies, Nt, max_iterations = max_iterations, extra = extra, p_extra = p_extra)
 
 plot_2d(x, t, u)
