@@ -17,8 +17,9 @@ end
 function get_lhs(max_order::Int)
     bdf_weights = precompute_bdf_weights(max_order)
 
-    function lhs!(du, u, p, it)
-        dt, x_array, t_array = p 
+    lhs = (du, u, p, it) -> begin
+        x_array, t_array = p 
+        dt = it == length(t_array) ? t_array[it] - t_array[it - 1] : t_array[it + 1] - t_array[it]
         fill!(du, 0.0)
         Nx = length(x_array)
         
@@ -39,5 +40,5 @@ function get_lhs(max_order::Int)
         return nothing
     end
 
-    return lhs!
+    return lhs
 end

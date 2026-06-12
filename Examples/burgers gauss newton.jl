@@ -1,12 +1,4 @@
 using Odil
-import Pkg
-# Pkg.add("SciMLBase")
-# Pkg.add("OptimizationBase")
-# Pkg.add("OptimizationOptimJL")
-# Pkg.add("ADTypes")
-# Pkg.add("Enzyme")
-# Pkg.add("ColorSchemes")
-# Pkg.add("Plots")
 include("../src/semidiscretization/burgers.jl")
 include("../src/references/burgers.jl")
 include("../src/solvers/odil_gauss_newton.jl")
@@ -17,14 +9,8 @@ Nt = 32
 x = range(0, 1, length=Nx)
 t = range(0, 1, length=Nt)
 
-dx = x[2] - x[1]
-dt = t[2] - t[1]
-
-@info "dx ", dx
-@info "dt ", dt
-
-p_lhs = (dt, x, t)
-p_rhs = (dx, x, t)
+p_lhs = (x, t)
+p_rhs = (x, t)
 
 u_t0  = [get_initial_burgers(x[ix]) for ix in 1:Nx]
 u_bounds_left = [0 for it in 2:Nt]
@@ -43,7 +29,7 @@ t_fixed_indicies = [t_t0; t_bounds_left; t_bounds_right]
 
 max_iterations = 100
 
-p_extra = (dx, dt, x, t)
+p_extra = (x, t)
 
 u_size_x = Nx
 

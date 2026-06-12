@@ -17,14 +17,8 @@ Nt = 32
 x = range(0, 1, length=Nx)
 t = range(0, 1, length=Nt)
 
-dx = x[2] - x[1]
-dt = t[2] - t[1]
-
-@info "dx ", dx
-@info "dt ", dt
-
-p_lhs = (dt, x, t)
-p_rhs = (dx, x, t)
+p_lhs = (x, t)
+p_rhs = (x, t)
 
 u_t0  = [get_initial_burgers(x[ix]) for ix in 1:Nx]
 u_bounds_left = [0 for it in 2:Nt]

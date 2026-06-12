@@ -1,11 +1,4 @@
 using Odil
-import Pkg
-Pkg.add("SciMLBase")
-Pkg.add("NonlinearSolveFirstOrder")
-Pkg.add("ADTypes")
-Pkg.add("Enzyme")
-Pkg.add("ColorSchemes")
-Pkg.add("Plots")
 include("../src/semidiscretization/wave.jl")
 include("../src/solvers/odil_gauss_newton.jl")
 
@@ -15,14 +8,8 @@ Nt = 32
 x = range(0, 1, length=Nx)
 t = range(-.5, .5, length=Nt)
 
-dx = x[2] - x[1]
-dt = t[2] - t[1]
-
-@info "dx ", dx
-@info "dt ", dt
-
-p_lhs = (dt, x, t)
-p_rhs = (dx, x, t)
+p_lhs = (x, t)
+p_rhs = (x, t)
 
 u_t0  = [get_exact_wave(x[ix], t[1]) for ix in 1:Nx]
 u_bounds_left = [get_exact_wave(x[1], t[it]) for it in 2:Nt]

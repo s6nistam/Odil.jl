@@ -1,5 +1,5 @@
 function rhs!(du, u, p, it)
-    dx, x, t = p 
+    x, t = p 
     fill!(du, 0.0)
     Nx = length(x)
     Nt = length(t)
@@ -9,20 +9,26 @@ function rhs!(du, u, p, it)
     bc_right = get_exact_wave(x[Nx], t_val)
     
     if it == 1
+        dx = x[2] - x[1]
         du[2] = Nt * (bc_left - 2 * u[2] + u[3]) / (dx^2)
     
-        for j in 3:Nx-2
-            du[j] = Nt * (u[j-1] - 2 * u[j] + u[j+1]) / (dx^2)
+        for ix in 3:Nx-2
+            dx = x[ix + 1] - x[ix]
+            du[ix] = Nt * (u[ix-1] - 2 * u[ix] + u[ix+1]) / (dx^2)
         end
         
+        dx = x[Nx] - x[Nx - 1]
         du[Nx-1] = Nt * (u[Nx-2] - 2 * u[Nx-1] + bc_right) / (dx^2)
     else
+        dx = x[2] - x[1]
         du[2] = (bc_left - 2 * u[2] + u[3]) / (dx^2)
         
-        for j in 3:Nx-2
-            du[j] = (u[j-1] - 2 * u[j] + u[j+1]) / (dx^2)
+        for ix in 3:Nx-2
+            dx = x[ix + 1] - x[ix]
+            du[ix] = (u[ix-1] - 2 * u[ix] + u[ix+1]) / (dx^2)
         end
         
+        dx = x[Nx] - x[Nx - 1]
         du[Nx-1] = (u[Nx-2] - 2 * u[Nx-1] + bc_right) / (dx^2)
     end
     
@@ -30,12 +36,13 @@ function rhs!(du, u, p, it)
 end
 
 function lhs!(du, u, p, it)
-    dt, x, t = p 
+    x, t = p 
     fill!(du, 0.0)
     Nx = length(x)
     Nt = length(t)
     
     if it == 1
+        dt = t[2] - t[1]
         t0 = t[1]
         penalty_vel = Nt 
         
@@ -44,6 +51,7 @@ function lhs!(du, u, p, it)
             du[j] = penalty_vel * (u[j, 2] - u[j, 1] - dt * v0) / dt^2
         end
     elseif it < size(u, ndims(u))
+        dt = t[it + 1] - t[it]
         for j in 2:Nx-1
             du[j] = (u[j, it+1] - 2 * u[j, it] + u[j, it-1]) / dt^2
         end

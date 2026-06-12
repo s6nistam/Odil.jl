@@ -1,12 +1,13 @@
 function rhs!(du, u, p, it)
-    dx, x_array, t_array = p 
+    x, t = p 
     fill!(du, 0.0)
-    Nx = length(x_array)
-    Nt = length(t_array)
-    t_val = t_array[it]
+    Nx = length(x)
+    Nt = length(t)
+    t_val = t[it]
 
     
     for ix in 2:(Nx-1)
+        dx = x[ix + 1] - x[ix]
         du[ix] = - u[ix] * (u[ix] - u[ix - 1]) / dx
     end
     
@@ -14,11 +15,12 @@ function rhs!(du, u, p, it)
 end
 
 function lhs!(du, u, p, it)
-    dt, x_array, t_array = p 
+    x, t = p 
     fill!(du, 0.0)
-    Nx = length(x_array)
-    Nt = length(t_array)
-    
+    Nx = length(x)
+    Nt = length(t)
+    dt = it == length(t) ? t[it] - t[it - 1] : t[it + 1] - t[it]
+
     for ix in 2:(Nx-1)
         du[ix] = (u[ix, it + 1] - u[ix, it]) / dt
     end
@@ -28,7 +30,7 @@ end
 
 
 function extra(u, p, iter)
-    dx, dt, x, t = p
+    x, t = p
     Nx = length(x)
     Nt = length(t)
     
@@ -37,7 +39,9 @@ function extra(u, p, iter)
     res = zeros(Nx - 2, Nt - 1, 2)
 
     for ix in 2:(Nx-1)
+        dx = x[ix + 1] - x[ix]
         for it in 1:(Nt-1)
+            dt = t[it + 1] - t[it]
             ux = (u[ix, it + 1] - u[ix - 1, it + 1]) / dx
             ut = (u[ix, it + 1] - u[ix, it]) / dt
             res[ix - 1, it, 1] = k * ux
