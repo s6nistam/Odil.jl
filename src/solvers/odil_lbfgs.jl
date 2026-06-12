@@ -70,7 +70,7 @@ function odil_lbfgs(lhs, rhs, p_lhs, p_rhs, u_size_x, u_fixed_vals, x_fixed_indi
     end
     
     println("Starte Lösung...")
-    res = solve(prob, opt, maxiters = 10000000, callback = callback)
+    res = solve(prob, opt, maxiters = max_iterations, callback = callback)
     
     u_final = reshape(res.u, space_dims..., Nt)
     println("Optimierung beendet!")
