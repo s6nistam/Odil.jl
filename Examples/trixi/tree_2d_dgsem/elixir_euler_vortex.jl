@@ -56,12 +56,12 @@ initial_condition = initial_condition_isentropic_vortex
 # To ensure that every example still runs we specify explicitly `FluxLaxFriedrichs(max_abs_speed_naive)`.
 # We remark, however, that the now default `max_abs_speed` is in general recommended due to compliance with the 
 # `StepsizeCallback` (CFL-Condition) and less diffusion.
-solver = DGSEM(polydeg = 3, surface_flux = FluxLaxFriedrichs(max_abs_speed_naive))
+solver = DGSEM(polydeg = 1, surface_flux = FluxLaxFriedrichs(max_abs_speed_naive))
 
 coordinates_min = (-10.0, -10.0)
 coordinates_max = (10.0, 10.0)
 mesh = TreeMesh(coordinates_min, coordinates_max,
-                initial_refinement_level = 4,
+                initial_refinement_level = 3,
                 n_cells_max = 10_000, periodicity = true)
 
 semi = SemidiscretizationHyperbolic(mesh, equations, initial_condition, solver;
@@ -70,7 +70,7 @@ semi = SemidiscretizationHyperbolic(mesh, equations, initial_condition, solver;
 ###############################################################################
 # ODE solvers, callbacks etc.
 
-tspan = (0.0, 20.0)
+tspan = (0.0, 1.0)
 ode = semidiscretize(semi, tspan)
 
 summary_callback = SummaryCallback()
@@ -90,16 +90,19 @@ save_solution = SaveSolutionCallback(interval = 100,
                                      save_final_solution = true,
                                      solution_variables = cons2prim)
 
-stepsize_callback = StepsizeCallback(cfl = 1.1)
+# stepsize_callback = StepsizeCallback(cfl = 1.1)
 
 callbacks = CallbackSet(summary_callback,
                         analysis_callback, alive_callback,
                         save_solution,
-                        stepsize_callback)
+                        # stepsize_callback
+                        )
 
 ###############################################################################
 # run the simulation
 
 sol = solve(ode, CarpenterKennedy2N54(williamson_condition = false);
-            dt = 1.0, # solve needs some value here but it will be overwritten by the stepsize_callback
-            ode_default_options()..., callback = callbacks);
+            dt = 0.2, # solve needs some value here but it will be overwritten by the stepsize_callback
+            ode_default_options()...,
+            save_everystep = true,
+            callback = callbacks);
