@@ -4,7 +4,7 @@ using Trixi
 ###############################################################################
 # semidiscretization of the linear advection equation
 
-advection_velocity = 1.0
+advection_velocity = 0.50
 equations = LinearScalarAdvectionEquation1D(advection_velocity)
 
 # Create DG solver with polynomial degree = 3 and (local) Lax-Friedrichs/Rusanov flux as surface flux
@@ -53,4 +53,6 @@ callbacks = CallbackSet(summary_callback, analysis_callback, save_solution,
 # OrdinaryDiffEq's `solve` method evolves the solution in time and executes the passed callbacks
 sol = solve(ode, CarpenterKennedy2N54(williamson_condition = false);
             dt = 1.0, # solve needs some value here but it will be overwritten by the stepsize_callback
-            ode_default_options()..., callback = callbacks);
+            ode_default_options()...,
+            save_everystep = true,
+            callback = callbacks);
