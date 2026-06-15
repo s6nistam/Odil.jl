@@ -6,8 +6,8 @@ include("aux/plot.jl")
 include("semidiscretization/wave.jl")
 include("references/wave.jl")
 
-export plot_comparison
-export plot_2d
+export plot_1d_time_comparison
+export plot_1d_time
 export get_exact_wave
 export get_exact_wave_velocity
 export rhs!

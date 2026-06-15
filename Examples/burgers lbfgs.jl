@@ -41,4 +41,4 @@ u_size_x = Nx
 
 u = odil_lbfgs(lhs!, rhs!, p_lhs, p_rhs, u_size_x, u_fixed_vals, x_fixed_indicies, t_fixed_indicies, Nt, max_iterations = max_iterations)
 
-plot_2d(x, t, u)
+plot_1d_time(x, t, u)

@@ -14,8 +14,8 @@ t = sol.t
 Nt = length(t)
 p_lhs = (x, t)
 
-u_approx = odil_gauss_newton(lhs, ode.f, p_lhs, ode.p, size(ode.u0), ode.u0, eachindex(ode.u0), [1 for _ in eachindex(ode.u0)], Nt; max_iterations = 1000)
+u_approx = odil_lbfgs(lhs, ode.f, p_lhs, ode.p, size(ode.u0), ode.u0, eachindex(ode.u0), [1 for _ in eachindex(ode.u0)], Nt; max_iterations = 100000)
 
-# plot_2d(x, t, u_approx)
+# plot_1d_time(x, t, u_approx)
 u_exact = reshape(sol, Nx, Nt)
-plot_comparison(x, t, u_exact, u_approx)
+plot_1d_time_comparison(x, t, u_exact, u_approx)

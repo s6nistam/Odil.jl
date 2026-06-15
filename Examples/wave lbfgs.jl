@@ -37,5 +37,5 @@ u_size_x = Nx
 
 u = odil_lbfgs(lhs!, rhs!, p_lhs, p_rhs, u_size_x, u_fixed_vals, x_fixed_indicies, t_fixed_indicies, Nt)
 
-plot_comparison(x, t, u_exact, u)
+plot_1d_time_comparison(x, t, u_exact, u)
 

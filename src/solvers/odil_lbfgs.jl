@@ -63,8 +63,8 @@ function odil_lbfgs(lhs, rhs, p_lhs, p_rhs, u_size_x, u_fixed_vals, x_fixed_indi
             println("Iteration ", state.iter, ": Loss = ", l)
 
             u_current = reshape(state.u, space_dims..., Nt)
-            # plot_comparison(x, t, u_exact, u_current)
-            plot_2d(x, t, u_current)
+            # plot_1d_time_comparison(x, t, u_exact, u_current)
+            plot_1d_time(x, t, u_current)
         end
         return false
     end

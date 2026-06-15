@@ -1,7 +1,7 @@
 using GLMakie
 using ColorSchemes
 
-function plot_comparison(x, t, u_exact, u_approx;
+function plot_1d_time_comparison(x, t, u_exact, u_approx;
     save_file = false, filename = "comparison.png")
 
     # We determine the min and max values to ensure both plots share the same color scale
@@ -32,7 +32,7 @@ function plot_comparison(x, t, u_exact, u_approx;
     return fig
 end
 
-function plot_2d(x, t, u;
+function plot_1d_time(x, t, u;
     save_file = false, filename = "solution.png")
 
     # We determine the min and max values
@@ -60,38 +60,48 @@ function plot_2d(x, t, u;
     return fig
 end
 
-function plot_2d_time(x, y, u;
-    save_file = false, filename = "solution.png")
+function plot_fe_1d_time(x, e, u;
+    save_file = false, filename = "solution.png", c_min = nothing, c_max = nothing)
 
-    # We determine the min and max values
-    z_min = minimum(u)
-    z_max = maximum(u)
-
-    # Create a new figure
     fig = Figure(size = (400, 400))
     it = Observable(1)
-    u_it = @lift(u[:, :, $it])
-    # Add heatmap to the figure
-    ax = Axis(fig[1, 1], xlabel = "x", ylabel = "y")
-    hm = heatmap!(ax, x, y, u_it, colorrange = (z_min, z_max), colormap = :viridis)
+    ax = Axis(fig[1, 1], xlabel = "x")
 
-    # Add a colorbar
-    Colorbar(fig[1, 2], hm, label = "Value")
+    if c_min === nothing
+        c_min = minimum(u)
+    end
+    if c_max === nothing
+        c_max = maximum(u)
+    end
+
+    for element in e
+        ue = u[:, element, :]
+        xe = x[:, element]
+        u_t = lift(it) do current_t
+            return ue[:, current_t]
+        end
+
+        hm_e = lines!(ax, 
+            xe, u_t,
+            color = u_t,
+            colorrange = (c_min, c_max), 
+            colormap = :viridis,
+            transparency = true, 
+        )
+    end
+        Colorbar(fig[1, 2], limits=(c_min, c_max), label = "Value")
 
 
     sg = SliderGrid(fig[2, 1],
         (label = "Time Step", range = 1:size(u, 3), startvalue = 1))
     
-    # Link slider to the Observable
     on(sg.sliders[1].value) do val
         it[] = val
-        ax.title = "Time index: $val" # Update title dynamically
+        ax.title = "Time index: $val"
     end
 
-    # Display the figure
     display(fig)
 
-    # Optional: Save to file
     if save_file
         save(filename, fig)
     end
@@ -99,6 +109,184 @@ function plot_2d_time(x, y, u;
     return fig
 end
 
+function plot_fe_1d_time_compare(x, e, u_exact, u_approx;
+    save_file = false, filename = "solution.png", c_min = nothing, c_max = nothing)
+
+    # Create a new figure
+    fig = Figure(size = (800, 400))
+    it = Observable(1)
+    ax_exact = Axis(fig[1, 1], xlabel = "x", title = "Exact Solution")
+    ax_approx = Axis(fig[1, 2], xlabel = "x", title = "Approximate Solution")
+
+    # We determine the min and max values
+    if c_min === nothing
+        c_min = minimum(u_exact)
+    end
+    if c_max === nothing
+        c_max = maximum(u_exact)
+    end
+
+    for element in e
+        ue_exact = u_exact[:, element, :]
+        ue_approx = u_approx[:, element, :]
+        xe = x[:, element]
+        u_t_exact = lift(it) do current_t
+            return ue_exact[:, current_t]
+        end
+        u_t_approx = lift(it) do current_t
+            return ue_approx[:, current_t]
+        end
+
+        hm_e_exact = lines!(ax_exact, 
+            xe, u_t_exact,
+            color = u_t_exact,
+            colorrange = (c_min, c_max), 
+            colormap = :viridis, 
+            transparency = true, 
+        )
+
+        hm_e_approx = lines!(ax_approx, 
+            xe, u_t_approx,
+            color = u_t_approx,
+            colorrange = (c_min, c_max), 
+            colormap = :viridis,
+            transparency = true, 
+        )
+    end
+        Colorbar(fig[1, 3], limits=(c_min, c_max), label = "Value")
+
+
+    sg = SliderGrid(fig[2, :],
+        (label = "Time Step", range = 1:size(u_exact, 3), startvalue = 1))
+    
+    on(sg.sliders[1].value) do val
+        it[] = val
+    end
+
+    display(fig)
+
+    if save_file
+        save(filename, fig)
+    end
+
+    return fig
+end
+
+function plot_fe_2d_time(x, y, e, u;
+    save_file = false, filename = "solution.png", c_min = nothing, c_max = nothing)
+
+    # Create a new figure
+    fig = Figure(size = (400, 400))
+    it = Observable(1)
+    ax = Axis(fig[1, 1], xlabel = "x", ylabel = "y")
+
+    # We determine the min and max values
+    if c_min === nothing
+        c_min = minimum(u)
+    end
+    if c_max === nothing
+        c_max = maximum(u)
+    end
+
+    for element in e
+        ue = u[:, :, element, :]
+        xe = x[:, :, element]
+        ye = y[:, :, element]
+        u_t = lift(it) do current_t
+            return ue[:, :, current_t]
+        end
+
+        hm_e = surface!(ax, 
+            xe, ye, u_t,
+            colorrange = (c_min, c_max), 
+            colormap = :viridis,
+            transparency = true,
+            shading = NoShading
+        )
+    end
+        Colorbar(fig[1, 2], limits=(c_min, c_max), label = "Value")
+
+
+    sg = SliderGrid(fig[2, 1],
+        (label = "Time Step", range = 1:size(u, 4), startvalue = 1))
+    
+    on(sg.sliders[1].value) do val
+        it[] = val
+        ax.title = "Time index: $val"
+    end
+
+    display(fig)
+
+    if save_file
+        save(filename, fig)
+    end
+
+    return fig
+end
+
+function plot_fe_2d_time_compare(x, y, e, u_exact, u_approx;
+    save_file = false, filename = "solution.png", c_min = nothing, c_max = nothing)
+
+    # Create a new figure
+    fig = Figure(size = (800, 400))
+    it = Observable(1)
+    ax_exact = Axis(fig[1, 1], xlabel = "x", ylabel = "y", title = "Exact Solution")
+    ax_approx = Axis(fig[1, 2], xlabel = "x", ylabel = "y", title = "Approximate Solution")
+
+    # We determine the min and max values
+    if c_min === nothing
+        c_min = minimum(u_exact)
+    end
+    if c_max === nothing
+        c_max = maximum(u_exact)
+    end
+
+    for element in e
+        ue_exact = u_exact[:, :, element, :]
+        ue_approx = u_approx[:, :, element, :]
+        xe = x[:, :, element]
+        ye = y[:, :, element]
+        u_t_exact = lift(it) do current_t
+            return ue_exact[:, :, current_t]
+        end
+        u_t_approx = lift(it) do current_t
+            return ue_approx[:, :, current_t]
+        end
+
+        hm_e_exact = surface!(ax_exact, 
+            xe, ye, u_t_exact,
+            colorrange = (c_min, c_max), 
+            colormap = :viridis,
+            transparency = true,
+            shading = NoShading
+        )
+        
+        hm_e_approx = surface!(ax_approx, 
+            xe, ye, u_t_approx,
+            colorrange = (c_min, c_max), 
+            colormap = :viridis,
+            transparency = true,
+            shading = NoShading
+        )
+    end
+        Colorbar(fig[1, 3], limits=(c_min, c_max), label = "Value")
+
+
+    sg = SliderGrid(fig[2, :],
+        (label = "Time Step", range = 1:size(u_exact, 4), startvalue = 1))
+    
+    on(sg.sliders[1].value) do val
+        it[] = val
+    end
+
+    display(fig)
+
+    if save_file
+        save(filename, fig)
+    end
+
+    return fig
+end
 
 function interpolate_to_equidistant(x, y, z, u)
     # Define the new equidistant grid
@@ -154,27 +342,6 @@ function interpolate_to_equidistant(x, y, z, u)
     
     return x_new, y_new, z_new, u_out
 end
-
-# function interpolate_to_equidistant(x::AbstractVector, y::AbstractVector, z::AbstractVector, u::AbstractArray{<:Any, 3})
-#     # 1. Ensure knots are in a tuple
-#     knots = (x, y, z)
-    
-#     # 2. Construct the interpolator
-#     # Gridded(Linear()) is correct for non-equidistant structured grids
-#     itp = interpolate(knots, u, Gridded(Linear()))
-
-#     # 3. Define the new equidistant grid 
-#     # Use range() to ensure floating point precision
-#     new_x = range(first(x), last(x), length=length(x))
-#     new_y = range(first(y), last(y), length=length(y))
-#     new_z = range(first(z), last(z), length=length(z))
-
-#     # 4. Interpolate onto the new grid
-#     # We use broadcasting (itp.(...)) for performance
-#     u_equidistant = [itp(xi, yi, zi) for xi in new_x, yi in new_y, zi in new_z]
-
-#     return new_x, new_y, new_z, u_equidistant
-# end
 
 function plot_fe_3d_time(x, y, z, e, u;
     save_file = false, filename = "solution.png", c_min = nothing, c_max = nothing)
@@ -253,7 +420,7 @@ function plot_fe_3d_time_compare(x, y, z, e, u_exact, u_approx;
     save_file = false, filename = "solution.png", c_min = nothing, c_max = nothing)
 
     # Create a new figure
-    fig = Figure(size = (400, 400))
+    fig = Figure(size = (800, 400))
     it = Observable(1)
     ax_exact = Axis3(fig[1, 1], xlabel = "x", ylabel = "y", zlabel = "z", title = "Exact Solution")
     ax_approx = Axis3(fig[1, 2], xlabel = "x", ylabel = "y", zlabel = "z", title = "Approximate Solution")
