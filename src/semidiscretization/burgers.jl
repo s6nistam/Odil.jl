@@ -1,10 +1,8 @@
-function rhs!(du, u, p, it)
+function rhs!(du, u, p, t_val)
     x, t = p 
     fill!(du, 0.0)
     Nx = length(x)
     Nt = length(t)
-    t_val = t[it]
-
     
     for ix in 2:(Nx-1)
         dx = x[ix + 1] - x[ix]

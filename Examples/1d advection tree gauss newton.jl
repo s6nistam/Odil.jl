@@ -16,14 +16,13 @@ coords = semi.cache.elements.node_coordinates
 x_o = eachindex(ode.u0)
 Nx = length(x_o)
 t = sol.t
-Nt = length(t)
 p_lhs = (x_o, t)
 
 u_matrix = reduce(hcat, vec.(sol.u))
 u_exact = reshape(u_matrix, polydeg + 1, (2^refinement_level), length(t))
 # plot_fe_3d_time(x, y, z, e, u_exact)
 # plot_fe_3d_time_compare(x, y, z, e, u_exact, u_exact)
-res = odil_gauss_newton(lhs!, ode.f, p_lhs, ode.p, size(ode.u0), ode.u0, eachindex(ode.u0), [1 for _ in eachindex(ode.u0)], Nt; max_iterations = 1000)
+res = odil_gauss_newton(lhs!, ode.f, p_lhs, ode.p, size(ode.u0), ode.u0, eachindex(ode.u0), [1 for _ in eachindex(ode.u0)], t; max_iterations = 1000)
 
 u_approx = reshape(res, polydeg + 1, (2^refinement_level), length(t))
 plot_fe_1d_time_compare(x, e, u_exact, u_approx, c_min = 0.0, c_max = 1.5)

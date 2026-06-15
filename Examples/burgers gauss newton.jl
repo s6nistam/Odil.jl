@@ -33,6 +33,6 @@ p_extra = (x, t)
 
 u_size_x = Nx
 
-u = odil_gauss_newton(lhs!, rhs!, p_lhs, p_rhs, u_size_x, u_fixed_vals, x_fixed_indicies, t_fixed_indicies, Nt, max_iterations = max_iterations, extra = extra, p_extra = p_extra)
+u = odil_gauss_newton(lhs!, rhs!, p_lhs, p_rhs, u_size_x, u_fixed_vals, x_fixed_indicies, t_fixed_indicies, t, max_iterations = max_iterations, extra = extra, p_extra = p_extra)
 
 plot_1d_time(x, t, u)

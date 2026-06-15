@@ -1,18 +1,19 @@
 using SciMLBase, OptimizationBase, OptimizationOptimJL, ADTypes, Enzyme, LinearAlgebra
 
-function odil_lbfgs(lhs, rhs, p_lhs, p_rhs, u_size_x, u_fixed_vals, x_fixed_indicies, t_fixed_indicies, Nt = 1000; extra = nothing,  p_extra = nothing, u_iter0 = nothing, max_iterations = 10000000)
-    space_dims = u_size_x
+function odil_lbfgs(lhs, rhs, p_lhs, p_rhs, u_iter0_size, u_fixed_vals, x_fixed_indicies, t_fixed_indicies, t; extra = nothing,  p_extra = nothing, u_iter0 = nothing, max_iterations = 10000000)
+    space_dims = u_iter0_size
     num_cells = prod(space_dims)
+    Nt = length(t)
     num_unknowns = num_cells * Nt
     iter = Ref(0)
     if u_iter0 === nothing
         u_iter0 = zeros(num_unknowns)
     end
 
-    p_all = (lhs, rhs, extra, p_lhs, p_rhs, p_extra, u_fixed_vals, x_fixed_indicies, t_fixed_indicies, space_dims, num_cells, num_unknowns, Nt, iter)
+    p_all = (lhs, rhs, extra, p_lhs, p_rhs, p_extra, u_fixed_vals, x_fixed_indicies, t_fixed_indicies, space_dims, num_cells, num_unknowns, t, Nt, iter)
 
     function loss(u_vec, p)
-        lhs_inner, rhs_inner, extra_inner, p_lhs_inner, p_rhs_inner, p_extra_inner, u_fixed_vals_inner, x_fixed_indicies_inner, t_fixed_indicies_inner, space_dims_inner, num_cells_inner, num_unknowns_inner, Nt_inner, iter_inner = p
+        lhs_inner, rhs_inner, extra_inner, p_lhs_inner, p_rhs_inner, p_extra_inner, u_fixed_vals_inner, x_fixed_indicies_inner, t_fixed_indicies_inner, space_dims_inner, num_cells_inner, num_unknowns_inner, t_inner, Nt_inner, iter_inner = p
         iter_inner[] += 1
 
         u_local = reshape(u_vec, space_dims_inner..., Nt_inner)
@@ -33,7 +34,8 @@ function odil_lbfgs(lhs, rhs, p_lhs, p_rhs, u_size_x, u_fixed_vals, x_fixed_indi
             fill!(du_rhs, 0.0)
             fill!(du_lhs, 0.0)
             
-            rhs_inner(du_rhs, u_rhs, p_rhs_inner, it)
+            t_val = t_inner[it]
+            rhs_inner(du_rhs, u_rhs, p_rhs_inner, t_val)
             lhs_inner(du_lhs, u_local, p_lhs_inner, it)
             
             for i in eachindex(du_rhs)

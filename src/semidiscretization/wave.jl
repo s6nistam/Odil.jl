@@ -1,14 +1,13 @@
-function rhs!(du, u, p, it)
+function rhs!(du, u, p, t_val)
     x, t = p 
     fill!(du, 0.0)
     Nx = length(x)
     Nt = length(t)
-    t_val = t[it]
     
     bc_left = get_exact_wave(x[1], t_val)
     bc_right = get_exact_wave(x[Nx], t_val)
     
-    if it == 1
+    if t_val == t[1]
         dx = x[2] - x[1]
         du[2] = Nt * (bc_left - 2 * u[2] + u[3]) / (dx^2)
     
