@@ -8,9 +8,14 @@ include("references/wave.jl")
 
 export plot_1d_time_comparison
 export plot_1d_time
+export plot_fe_1d_time_compare
+export plot_fe_1d_time
+export plot_fe_2d_time_compare
+export plot_fe_2d_time
+export plot_fe_3d_time_compare
+export plot_fe_3d_time
 export get_exact_wave
 export get_exact_wave_velocity
-export rhs!
 
 greet() = print("Hello ODIL!")
 

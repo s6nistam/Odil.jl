@@ -6,9 +6,10 @@ include("../src/solvers/odil_gauss_newton.jl")
 
 polydeg = 3
 refinement_level = 4
+ndims = 1
+
 coords = semi.cache.elements.node_coordinates
 x = coords[1, :, :]
-e = 1:(2^refinement_level)
 
 lhs! = get_lhs(polydeg)
 
@@ -16,13 +17,21 @@ coords = semi.cache.elements.node_coordinates
 x_o = eachindex(ode.u0)
 Nx = length(x_o)
 t = sol.t
+Nt = length(t)
 p_lhs = (x_o, t)
 
+e = 1:(2^refinement_level)^ndims
+variables = Int64(Nx/((polydeg + 1)^ndims * (2^refinement_level)^ndims))
+sol_shape = (variables, (polydeg + 1 for _ in 1:ndims)..., (2^refinement_level)^ndims, Nt)
+
 u_matrix = reduce(hcat, vec.(sol.u))
-u_exact = reshape(u_matrix, polydeg + 1, (2^refinement_level), length(t))
+u_exact = reshape(u_matrix, sol_shape...)
 # plot_fe_3d_time(x, y, z, e, u_exact)
 # plot_fe_3d_time_compare(x, y, z, e, u_exact, u_exact)
-res = odil_gauss_newton(lhs!, ode.f, p_lhs, ode.p, size(ode.u0), ode.u0, eachindex(ode.u0), [1 for _ in eachindex(ode.u0)], t; max_iterations = 1000)
+res = odil_gauss_newton(lhs!, ode.f, p_lhs, ode.p, Nx, ode.u0, 1:length(ode.u0), t; max_iterations = 1000)
 
-u_approx = reshape(res, polydeg + 1, (2^refinement_level), length(t))
-plot_fe_1d_time_compare(x, e, u_exact, u_approx, c_min = 0.0, c_max = 1.5)
+u_approx = reshape(res, sol_shape...)
+
+for var in 1:variables
+    plot_fe_1d_time_compare(x, e, u_exact[var, :, :, :], u_approx[var, :, :, :], c_min = 0.0, c_max = 1.5)
+end
