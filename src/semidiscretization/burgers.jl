@@ -18,9 +18,10 @@ function lhs!(du, u, p, it)
     Nx = length(x)
     Nt = length(t)
     dt = it == length(t) ? t[it] - t[it - 1] : t[it + 1] - t[it]
+    idx = LinearIndices((Nx, Nt))
 
     for ix in 2:(Nx-1)
-        du[ix] = (u[ix, it + 1] - u[ix, it]) / dt
+        du[ix] = (u[idx[ix, it + 1]] - u[idx[ix, it]]) / dt
     end
     
     return nothing
@@ -31,6 +32,7 @@ function extra(u, p, iter)
     x, t = p
     Nx = length(x)
     Nt = length(t)
+    idx = LinearIndices((Nx, Nt))
     
     k = 0.01 * 2.0^(-iter/6.0)
 
@@ -40,8 +42,8 @@ function extra(u, p, iter)
         dx = x[ix + 1] - x[ix]
         for it in 1:(Nt-1)
             dt = t[it + 1] - t[it]
-            ux = (u[ix, it + 1] - u[ix - 1, it + 1]) / dx
-            ut = (u[ix, it + 1] - u[ix, it]) / dt
+            ux = (u[idx[ix, it + 1]] - u[idx[ix - 1, it + 1]]) / dx
+            ut = (u[idx[ix, it + 1]] - u[idx[ix, it]]) / dt
             res[ix - 1, it, 1] = k * ux
             res[ix - 1, it, 2] = k * ut
         end

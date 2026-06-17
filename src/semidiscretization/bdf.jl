@@ -18,10 +18,11 @@ function get_lhs(max_order::Int)
     bdf_weights = precompute_bdf_weights(max_order)
 
     lhs = (du, u, p, it) -> begin
-        x_array, t_array = p 
-        dt = it == length(t_array) ? t_array[it] - t_array[it - 1] : t_array[it + 1] - t_array[it]
+        x, t = p 
+        dt = it == length(t) ? t[it] - t[it - 1] : t[it + 1] - t[it]
         fill!(du, 0.0)
-        Nx = length(x_array)
+        Nx = length(x)
+        Nt = length(t)
         
         current_order = min(it, max_order)
         
@@ -33,7 +34,7 @@ function get_lhs(max_order::Int)
             val = 0.0
             for w_idx in 1:length(weights)
                 time_idx = (it + 1) - (w_idx - 1)
-                val += weights[w_idx] * u[ix, time_idx]
+                val += weights[w_idx] * u[LinearIndices((Nx, Nt))[ix, time_idx]]
             end
             du[ix] = val * inv_dt
         end
