@@ -56,6 +56,7 @@ function odil_gauss_newton(lhs, rhs, p_lhs, p_rhs, u_iter0_size, u_fixed_vals, x
     
     prob = NonlinearLeastSquaresProblem(operator_loss, u_iter0, p_all)
     opt = GaussNewton(autodiff = autodiff)
+    # opt = LevenbergMarquardt(autodiff = autodiff, damping_initial = 0.01)
 
     callback = function (cache, iter)
         println("Iteration ", iter, ": Loss = ", norm(cache.fu))
