@@ -35,7 +35,8 @@ function odil_lbfgs(lhs, rhs, p_lhs, p_rhs, u_iter0_size, u_fixed_vals, x_fixed_
             fill!(du_lhs, 0.0)
             
             t_val = t_inner[it]
-            rhs_inner(du_rhs, u_rhs, p_rhs_inner, t_val)
+            t_val_next = t_inner[it + 1]
+            rhs_inner(du_rhs, u_rhs, p_rhs_inner, t_val_next)
             lhs_inner(du_lhs, u_local, p_lhs_inner, it)
             
             for i in eachindex(du_rhs)
@@ -64,8 +65,8 @@ function odil_lbfgs(lhs, rhs, p_lhs, p_rhs, u_iter0_size, u_fixed_vals, x_fixed_
         if state.iter % 1000 == 0 || state.iter == 1
             println("Iteration ", state.iter, ": Loss = ", l)
 
-            # u_current = reshape(state.u, space_dims..., Nt)
-            # plot_1d_time_comparison(x, t, u_exact, u_current)
+            u_current = reshape(state.u, space_dims..., Nt)
+            plot_1d_time(x, t, u_current)
         end
         return false
     end

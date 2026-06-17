@@ -20,6 +20,7 @@ function odil_gauss_newton(lhs, rhs, p_lhs, p_rhs, u_iter0_size, u_fixed_vals, x
         l_exact = zeros(eltype(u_vec), length(u_fixed_vals_inner))
 
         for (i, (u_val, ix, it)) in enumerate(zip(u_fixed_vals_inner, x_fixed_indicies_inner, t_fixed_indicies_inner))
+            #TODO: fix indicies. probably just use u_vec and use LinearIndices[...] to get the right index
             l_exact[i] = (num_unknowns_inner/length(u_fixed_vals_inner)) * (u_local[ix..., it] - u_val)
         end
 
@@ -30,11 +31,12 @@ function odil_gauss_newton(lhs, rhs, p_lhs, p_rhs, u_iter0_size, u_fixed_vals, x
         
         for it in 1:(Nt_inner - 1)
             t_val = t_inner[it]
+            t_val_next = t_inner[it + 1]
             u_rhs = vec(selectdim(u_local, length(space_dims_inner) + 1, it))
             fill!(du_rhs, 0.0)
             fill!(du_lhs, 0.0)
             
-            rhs_inner(du_rhs, u_rhs, p_rhs_inner, t_val)
+            rhs_inner(du_rhs, u_rhs, p_rhs_inner, t_val_next)
             lhs_inner(du_lhs, u_local, p_lhs_inner, it)
             
             for i in 1:num_cells_inner
