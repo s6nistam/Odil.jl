@@ -44,7 +44,7 @@ initial_condition = initial_condition_blast_wave
 # `StepsizeCallback` (CFL-Condition) and less diffusion.
 surface_flux = FluxLaxFriedrichs(max_abs_speed_naive)
 volume_flux = flux_ranocha
-basis = LobattoLegendreBasis(3)
+basis = LobattoLegendreBasis(2)
 indicator_sc = IndicatorHennemannGassner(equations, basis,
                                          alpha_max = 0.5,
                                          alpha_min = 0.001,
@@ -58,7 +58,7 @@ solver = DGSEM(basis, surface_flux, volume_integral)
 coordinates_min = (-2.0, -2.0)
 coordinates_max = (2.0, 2.0)
 mesh = TreeMesh(coordinates_min, coordinates_max,
-                initial_refinement_level = 6,
+                initial_refinement_level = 3,
                 n_cells_max = 10_000, periodicity = true)
 
 semi = SemidiscretizationHyperbolic(mesh, equations, initial_condition, solver;
@@ -77,7 +77,7 @@ analysis_callback = AnalysisCallback(semi, interval = analysis_interval)
 
 alive_callback = AliveCallback(analysis_interval = analysis_interval)
 
-save_solution = SaveSolutionCallback(interval = 100,
+save_solution = SaveSolutionCallback(interval = 5,
                                      save_initial_solution = true,
                                      save_final_solution = true,
                                      solution_variables = cons2prim)
@@ -87,11 +87,15 @@ stepsize_callback = StepsizeCallback(cfl = 0.9)
 callbacks = CallbackSet(summary_callback,
                         analysis_callback, alive_callback,
                         save_solution,
-                        stepsize_callback)
+                        stepsize_callback
+                        )
 
 ###############################################################################
 # run the simulation
 
 sol = solve(ode, CarpenterKennedy2N54(williamson_condition = false);
-            dt = 1.0, # solve needs some value here but it will be overwritten by the stepsize_callback
-            ode_default_options()..., callback = callbacks);
+            dt = 1, # solve needs some value here but it will be overwritten by the stepsize_callback
+            ode_default_options()...,
+            # save_everystep = true,
+            saveat = [0.0, 2.5, 5.0, 7.5, 10.0, 12.5],
+            callback = callbacks);
