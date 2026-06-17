@@ -11,6 +11,7 @@ coords = semi.cache.elements.node_coordinates
 x = vec(coords[1, :, :])
 Nx = length(x)
 t = sol.t
+Nt = length(t)
 p_lhs = (x, t)
 
 u_approx = odil_lbfgs(lhs, ode.f, p_lhs, ode.p, size(ode.u0), ode.u0, eachindex(ode.u0), [1 for _ in eachindex(ode.u0)], t; max_iterations = 100000)
