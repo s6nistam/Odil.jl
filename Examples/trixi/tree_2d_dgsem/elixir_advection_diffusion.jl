@@ -10,14 +10,14 @@ diffusivity() = 5.0e-2
 equations_parabolic = LaplaceDiffusion2D(diffusivity(), equations)
 
 # Create DG solver with polynomial degree = 3 and (local) Lax-Friedrichs/Rusanov flux as surface flux
-solver = DGSEM(polydeg = 3, surface_flux = flux_lax_friedrichs)
+solver = DGSEM(polydeg = 1, surface_flux = flux_lax_friedrichs)
 
 coordinates_min = (-1.0, -1.0) # minimum coordinates (min(x), min(y))
 coordinates_max = (1.0, 1.0) # maximum coordinates (max(x), max(y))
 
 # Create a uniformly refined mesh with periodic boundaries
 mesh = TreeMesh(coordinates_min, coordinates_max,
-                initial_refinement_level = 4,
+                initial_refinement_level = 3,
                 periodicity = true,
                 n_cells_max = 30_000) # set maximum capacity of tree data structure
 
@@ -79,4 +79,6 @@ callbacks = CallbackSet(summary_callback, analysis_callback, alive_callback)
 alg = RDPK3SpFSAL49()
 time_int_tol = 1.0e-11
 sol = solve(ode, alg; abstol = time_int_tol, reltol = time_int_tol,
-            ode_default_options()..., callback = callbacks)
+            ode_default_options()...,
+            save_everystep = true,
+            callback = callbacks)
