@@ -1,7 +1,7 @@
 using Odil
 include("./trixi/structured_1d_dgsem/elixir_advection_basic.jl")
 include("../src/semidiscretization/bdf.jl")
-include("../src/solvers/odil_lbfgs.jl")
+include("../src/solvers/odil_gauss_newton.jl")
 
 polydeg = 3
 
