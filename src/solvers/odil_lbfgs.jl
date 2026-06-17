@@ -1,6 +1,6 @@
 using SciMLBase, OptimizationBase, OptimizationOptimJL, ADTypes, Enzyme, LinearAlgebra
 
-function odil_lbfgs(lhs, rhs, p_lhs, p_rhs, u_iter0_size, u_fixed_vals, x_fixed_indicies, t_fixed_indicies, t; extra = nothing,  p_extra = nothing, u_iter0 = nothing, max_iterations = 10000000)
+function odil_lbfgs(lhs, rhs, p_lhs, p_rhs, u_iter0_size, u_fixed_vals, x_fixed_indicies, t_fixed_indicies, t; extra = nothing,  p_extra = nothing, u_iter0 = nothing, max_iterations = 10000000, autodiff = AutoEnzyme())
     space_dims = u_iter0_size
     num_cells = prod(space_dims)
     Nt = length(t)
@@ -26,8 +26,8 @@ function odil_lbfgs(lhs, rhs, p_lhs, p_rhs, u_iter0_size, u_fixed_vals, x_fixed_
 
         l_pde = zero(eltype(u_vec))
         
-        du_rhs = zeros(num_cells_inner)
-        du_lhs = zeros(num_cells_inner)
+        du_rhs = zeros(eltype(u_vec), num_cells_inner)
+        du_lhs = zeros(eltype(u_vec), num_cells_inner)
         
         for it in 1:(Nt_inner - 1)
             u_rhs = vec(selectdim(u_local, length(space_dims_inner) + 1, it))
@@ -55,7 +55,7 @@ function odil_lbfgs(lhs, rhs, p_lhs, p_rhs, u_iter0_size, u_fixed_vals, x_fixed_
         return l
     end
     
-    optf = OptimizationFunction(loss, ADTypes.AutoEnzyme())
+    optf = OptimizationFunction(loss, autodiff)
     prob = OptimizationProblem(optf, u_iter0, p_all) 
     # opt = LBFGS(m = 50)
     opt = LBFGS()
@@ -64,9 +64,8 @@ function odil_lbfgs(lhs, rhs, p_lhs, p_rhs, u_iter0_size, u_fixed_vals, x_fixed_
         if state.iter % 1000 == 0 || state.iter == 1
             println("Iteration ", state.iter, ": Loss = ", l)
 
-            u_current = reshape(state.u, space_dims..., Nt)
+            # u_current = reshape(state.u, space_dims..., Nt)
             # plot_1d_time_comparison(x, t, u_exact, u_current)
-            plot_1d_time(x, t, u_current)
         end
         return false
     end
