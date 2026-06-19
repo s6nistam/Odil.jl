@@ -1,27 +1,21 @@
 function rhs!(du, u, p, t_val)
-    x, t = p 
-    fill!(du, 0.0)
-    Nx = length(x)
-    Nt = length(t)
+    x, Nx, dx, t, Nt, dt = p 
+    fill!(du, zero(eltype(u)))
     
     for ix in 2:(Nx-1)
-        dx = x[ix + 1] - x[ix]
-        du[ix] = - u[ix] * (u[ix] - u[ix - 1]) / dx
+        du[ix] = - u[ix] * (u[ix] - u[ix - 1]) / dx[ix - 1]
     end
     
     return nothing
 end
 
 function lhs!(du, u, p, it)
-    x, t = p 
-    fill!(du, 0.0)
-    Nx = length(x)
-    Nt = length(t)
-    dt = it == length(t) ? t[it] - t[it - 1] : t[it + 1] - t[it]
+    x, Nx, dx, t, Nt, dt = p 
+    fill!(du, zero(eltype(u)))
     idx = LinearIndices((Nx, Nt))
 
     for ix in 2:(Nx-1)
-        du[ix] = (u[idx[ix, it + 1]] - u[idx[ix, it]]) / dt
+        du[ix] = (u[idx[ix, it + 1]] - u[idx[ix, it]]) / dt[it]
     end
     
     return nothing
@@ -29,9 +23,7 @@ end
 
 
 function extra(du, u, p, iter)
-    x, t = p
-    Nx = length(x)
-    Nt = length(t)
+    x, Nx, dx, t, Nt, dt = p
     idx = LinearIndices((Nx, Nt))
     
     k = 0.01 * 2.0^(-iter/6.0)
@@ -39,11 +31,9 @@ function extra(du, u, p, iter)
     idx = LinearIndices((Nx - 2, Nt - 1, 2))
 
     for ix in 2:(Nx-1)
-        dx = x[ix + 1] - x[ix]
         for it in 1:(Nt-1)
-            dt = t[it + 1] - t[it]
-            ux = (u[idx[ix, it + 1]] - u[idx[ix - 1, it + 1]]) / dx
-            ut = (u[idx[ix, it + 1]] - u[idx[ix, it]]) / dt
+            ux = (u[idx[ix, it + 1]] - u[idx[ix - 1, it + 1]]) / dx[ix - 1]
+            ut = (u[idx[ix, it + 1]] - u[idx[ix, it]]) / dt[it]
             du[idx[ix - 1, it, 1]] = k * ux
             du[idx[ix - 1, it, 2]] = k * ut
         end

@@ -12,11 +12,13 @@ x = coords[1, :, :]
 
 lhs = get_lhs(polydeg)
 
-x_o = eachindex(ode.u0)
+x_o = vec(coords)
 Nx = length(x_o)
+dx = [x_o[i + 1] - x_o[i] for i in 1:Nx-1]
 t = sol.t
 Nt = length(t)
-p_lhs = (x_o, t)
+dt = [t[i + 1] - t[i] for i in 1:Nt-1]
+p_lhs = (x_o, Nx, dx, t, Nt, dt)
 
 e = 1:(2^refinement_level)^ndims
 variables = Int64(Nx/((polydeg + 1)^ndims * (2^refinement_level)^ndims))

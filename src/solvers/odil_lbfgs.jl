@@ -56,7 +56,7 @@ function odil_lbfgs(lhs, rhs, p_lhs, p_rhs, Nx, u_reference_vals, reference_val_
 
     callback = function (state, l)
         iter = state.iter
-        if state.iter % 1000 == 0 || state.iter == 1
+        if state.iter % 10 == 0 || state.iter == 1
             println("Iteration ", state.iter, ": Loss = ", l)
 
             # u_current = reshape(state.u, Nx, Nt)

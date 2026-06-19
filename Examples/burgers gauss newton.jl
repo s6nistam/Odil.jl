@@ -9,8 +9,11 @@ Nt = 32
 x = range(0, 1, length=Nx)
 t = range(0, 1, length=Nt)
 
-p_lhs = (x, t)
-p_rhs = (x, t)
+dx = [x[i + 1] - x[i] for i in 1:Nx-1]
+dt = [t[i + 1] - t[i] for i in 1:Nt-1]
+
+p_lhs = (x, Nx, dx, t, Nt, dt)
+p_rhs = (x, Nx, dx, t, Nt, dt)
 
 u_t0  = [get_initial_burgers(x[ix]) for ix in 1:Nx]
 u_bounds_left = [0 for it in 2:Nt]
@@ -26,7 +29,7 @@ reference_val_indices = [idx_t0; idx_bounds_left; idx_bounds_right]
 
 max_iterations = 100
 
-p_extra = (x, t)
+p_extra = (x, Nx, dx, t, Nt, dt)
 
 u = odil_gauss_newton(lhs!, rhs!, p_lhs, p_rhs, Nx, u_reference_vals, reference_val_indices, t, max_iterations = max_iterations, extra = extra, p_extra = p_extra)
 
