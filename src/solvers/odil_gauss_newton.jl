@@ -47,8 +47,6 @@ function odil_gauss_newton(lhs, rhs, p_lhs, p_rhs, Nx, u_reference_vals, referen
             end
         end
 
-        l = vcat(l_exact, l_pde)
-
         du[Nref_inner + Nx_inner * (Nt_inner - 1) + 1:end] .= zero(eltype(u_vec))
         l_extra = @view(du[Nref_inner + Nx_inner * (Nt_inner - 1) + 1:end])
 
