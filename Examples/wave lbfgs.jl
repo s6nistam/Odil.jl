@@ -6,8 +6,8 @@ include("../src/solvers/odil_lbfgs.jl")
 Nx = 32
 Nt = 32
 
-x = range(0, 1, length=Nx)
-t = range(-.5, .5, length=Nt)
+x = range(-1, 1, length=Nx)
+t = range(0, 1, length=Nt)
 
 dx = [x[i + 1] - x[i] for i in 1:Nx-1]
 dt = [t[i + 1] - t[i] for i in 1:Nt-1]
