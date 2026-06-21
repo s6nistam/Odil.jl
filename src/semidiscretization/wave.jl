@@ -4,9 +4,15 @@ function rhs!(du, u, p, t_val)
     idx = LinearIndices((Nx, 2))
     
     du[idx[:, 1]] .= u[idx[:, 2]]
-    for ix in 2:Nx-1
-        du[idx[ix, 2]] = (u[idx[ix-1, 1]] - 2 * u[idx[ix, 1]] + u[idx[ix+1, 1]]) / (dx[ix]^2)
+    for ix in 2:(Nx - 1)
+        du[idx[ix, 2]] = (u[idx[ix - 1, 1]] - 2 * u[idx[ix, 1]] + u[idx[ix + 1, 1]]) / (dx[ix]^2)
     end
+
+    u_l = (u[idx[2, 1]] - 6*u[idx[1, 1]] + 8*get_exact_wave(x[1] - dx[1], t_val))/3
+    u_r = (u[idx[Nx - 1, 1]] - 6 * u[idx[Nx, 1]] + 8 * get_exact_wave(x[Nx] + dx[Nx - 1], t_val)) / 3
+
+    du[idx[1, 2]] = (u_l - 2 * u[idx[1, 1]] + u[idx[2, 1]]) / (dx[1]^2)
+    du[idx[Nx, 2]] = (u[idx[Nx - 1, 1]] - 2 * u[idx[Nx, 1]] + u_r) / (dx[Nx - 1]^2)
 
     return nothing
 end
