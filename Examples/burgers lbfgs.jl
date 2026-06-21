@@ -39,4 +39,6 @@ max_iterations = 10000
 
 u = odil_lbfgs(lhs!, rhs!, p_lhs, p_rhs, Nx, u_reference_vals, reference_val_indices, t, max_iterations = max_iterations)
 
+u = reshape(u, Nx, Nt)
+
 plot_1d_time(x, t, u)

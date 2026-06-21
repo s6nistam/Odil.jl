@@ -51,7 +51,8 @@ function odil_gauss_newton(lhs, rhs, p_lhs, p_rhs, Nx, u_reference_vals, referen
         l_extra = @view(du[Nref_inner + Nx_inner * (Nt_inner - 1) + 1:end])
 
         if extra_inner !== nothing && p_extra_inner !== nothing
-            extra_inner(l_extra, u_vec, p_extra_inner, iter_inner[])/sqrt(len_extra)
+            extra_inner(l_extra, u_vec, p_extra_inner, iter_inner[])
+            l_extra ./= sqrt(len_extra)
         end
 
         return nothing

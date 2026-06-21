@@ -30,7 +30,10 @@ reference_val_indices = [idx_t0; idx_bounds_left; idx_bounds_right]
 max_iterations = 100
 
 p_extra = (x, Nx, dx, t, Nt, dt)
+len_extra = (Nx - 2) * (Nt - 1) * 2
 
-u = odil_gauss_newton(lhs!, rhs!, p_lhs, p_rhs, Nx, u_reference_vals, reference_val_indices, t, max_iterations = max_iterations, extra = extra, p_extra = p_extra)
+u = odil_gauss_newton(lhs!, rhs!, p_lhs, p_rhs, Nx, u_reference_vals, reference_val_indices, t, max_iterations = max_iterations, extra = extra, p_extra = p_extra, len_extra = len_extra)
+
+u = reshape(u, Nx, Nt)
 
 plot_1d_time(x, t, u)

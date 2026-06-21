@@ -1,6 +1,6 @@
 using SciMLBase, OptimizationBase, OptimizationOptimJL, ADTypes, Enzyme, LinearAlgebra
 
-function odil_lbfgs(lhs, rhs, p_lhs, p_rhs, Nx, u_reference_vals, reference_val_indices, t; extra = nothing,  p_extra = nothing, len_extra = 0, u_iter0 = nothing, max_iterations = 10000000, autodiff = AutoEnzyme())
+function odil_lbfgs(lhs, rhs, p_lhs, p_rhs, Nx, u_reference_vals, reference_val_indices, t; extra = nothing,  p_extra = nothing, len_extra = 0, u_iter0 = nothing, max_iterations = 100000, autodiff = AutoEnzyme())
     Nref = length(u_reference_vals)
     Nt = length(t)
     num_unknowns = Nx * Nt
@@ -56,7 +56,7 @@ function odil_lbfgs(lhs, rhs, p_lhs, p_rhs, Nx, u_reference_vals, reference_val_
 
     callback = function (state, l)
         iter = state.iter
-        if state.iter % 10 == 0 || state.iter == 1
+        if state.iter % 1000 == 0 || state.iter == 1
             println("Iteration ", state.iter, ": Loss = ", l)
 
             # u_current = reshape(state.u, Nx, Nt)
