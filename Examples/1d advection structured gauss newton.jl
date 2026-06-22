@@ -3,7 +3,7 @@ include("./trixi/structured_1d_dgsem/elixir_advection_basic.jl")
 include("../src/semidiscretization/bdf.jl")
 include("../src/solvers/odil_gauss_newton.jl")
 
-polydeg = 3
+polydeg = 2
 refinement_level = 4
 ndims = 1
 
@@ -29,7 +29,6 @@ u_exact = reshape(u_matrix, sol_shape...)
 res = odil_gauss_newton(lhs, ode.f, p_lhs, ode.p, Nx, ode.u0, 1:length(ode.u0), t; max_iterations = 1000)
 
 u_approx = reshape(res, sol_shape...)
-# plot_1d_time(x, t, u_approx)
 for var in 1:variables
     plot_fe_1d_time_compare(x, e, u_exact[var, :, :, :], u_approx[var, :, :, :], c_min = 0.0, c_max = 1.5)
 end

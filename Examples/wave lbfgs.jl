@@ -36,7 +36,7 @@ idx_t_t0  = [idx[ix, 2, 1] for ix in 1:Nx]
 
 reference_val_indices = [idx_t0; idx_bounds_left; idx_bounds_right; idx_t_t0]
 
-u = odil_lbfgs(lhs!, rhs!, p_lhs, p_rhs, 2 * Nx, u_reference_vals, reference_val_indices, t, max_iterations=20000)
+u = odil_lbfgs(lhs!, rhs!, p_lhs, p_rhs, 2 * Nx, u_reference_vals, reference_val_indices, t, max_iterations=100000)
 
 u = reshape(u, Nx, 2, Nt)
 
