@@ -4,7 +4,7 @@ include("../src/aux/plot.jl")
 include("../src/semidiscretization/bdf.jl")
 include("../src/solvers/odil_gauss_newton.jl")
 
-polydeg = 3
+polydeg = 2
 refinement_level = 4
 ndims = 1
 
