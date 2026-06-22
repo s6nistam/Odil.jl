@@ -1,4 +1,4 @@
-using SciMLBase, OptimizationBase, OptimizationOptimJL, ADTypes, Enzyme, LinearAlgebra, FiniteDiff
+using SciMLBase, OptimizationBase, OptimizationOptimJL, ADTypes, Enzyme, LinearAlgebra
 
 function odil_lbfgs(lhs, rhs, p_lhs, p_rhs, Nx, u_reference_vals, reference_val_indices, t; extra = nothing,  p_extra = nothing, len_extra = 0, u_iter0 = nothing, max_iterations = 100000, autodiff = AutoEnzyme())
     Nref = length(u_reference_vals)
