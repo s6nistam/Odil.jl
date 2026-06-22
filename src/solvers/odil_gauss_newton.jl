@@ -36,7 +36,7 @@ function odil_gauss_newton(lhs, rhs, p_lhs, p_rhs, Nx, u_reference_vals, referen
             u_rhs = @view(u_vec[((it - 2) * Nx_inner + 1):((it - 1) * Nx_inner)])
             # u_rhs = u_vec[(it * Nx_inner + 1):((it + 1) * Nx_inner)]
 
-            t_val = t_inner[it]
+            t_val = t_inner[it - 1]
             # t_val_next = t_inner[it + 1]
             rhs_inner(du_rhs, u_rhs, p_rhs_inner, t_val)
             # rhs_inner(du_rhs, u_rhs, p_rhs_inner, t_val_next)
