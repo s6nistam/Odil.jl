@@ -65,7 +65,7 @@ function odil_lbfgs(lhs, rhs, p_lhs, p_rhs, Nx, u_reference_vals, reference_val_
         #     println("Gradient= ", state.grad)
         # end
         if state.iter % 10 == 0 || state.iter == 1
-            println("Iteration ", state.iter, ": Loss = ", l)
+            println("Iteration ", state.iter, ": Loss = ", l, " Loss gradient = ", norm(state.grad))
 
             # u_current = reshape(state.u, Nx, Nt)
             # plot_1d_time(x, t, u_current)

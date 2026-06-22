@@ -64,7 +64,7 @@ function odil_gauss_newton(lhs, rhs, p_lhs, p_rhs, Nx, u_reference_vals, referen
     # opt = LevenbergMarquardt(autodiff = autodiff, damping_initial = 0.01)
 
     callback = function (cache, iter)
-        println("Iteration ", iter, ": Loss = ", norm(cache.fu))
+            println("Iteration ", iter, ": Loss = ", norm(cache.fu), " descent direction = ", norm(get_du(cache.descent_cache)))
         u_current = reshape(cache.u, Nx, Nt)
         # plot_1d_time(x, t, u_current)
         return false # false = Optimierung weiterlaufen lassen
