@@ -1,7 +1,6 @@
 using Odil
 include("./trixi/structured_1d_dgsem/elixir_advection_basic.jl")
 include("../src/semidiscretization/bdf.jl")
-include("../src/solvers/odil_gauss_newton.jl")
 
 polydeg = 2
 refinement_level = 4
@@ -26,7 +25,8 @@ sol_shape = (variables, (polydeg + 1 for _ in 1:ndims)..., (2^refinement_level)^
 
 u_matrix = reduce(hcat, vec.(sol.u))
 u_exact = reshape(u_matrix, sol_shape...)
-res = odil_gauss_newton(lhs, ode.f, p_lhs, ode.p, Nx, ode.u0, 1:length(ode.u0), t; max_iterations = 1000)
+problem = Odil1D(lhs, ode.f, p_lhs, ode.p, Nx, ode.u0, 1:length(ode.u0), t, x)
+res = odil_gauss_newton(problem; max_iterations = 1000)
 
 u_approx = reshape(res, sol_shape...)
 for var in 1:variables

@@ -1,6 +1,5 @@
 using Odil
 include("../src/semidiscretization/wave.jl")
-include("../src/solvers/odil_gauss_newton.jl")
 
 Nx = 32
 Nt = 32
@@ -35,7 +34,8 @@ idx_t_t0  = [idx[ix, 2, 1] for ix in 1:Nx]
 
 reference_val_indices = [idx_t0; idx_bounds_left; idx_bounds_right; idx_t_t0]
 
-u = odil_gauss_newton(lhs!, rhs!, p_lhs, p_rhs, 2 * Nx, u_reference_vals, reference_val_indices, t)
+problem = Odil1D(lhs!, rhs!, p_lhs, p_rhs, 2 * Nx, u_reference_vals, reference_val_indices, t, x)
+u = odil_gauss_newton(problem)
 
 u = reshape(u, Nx, 2, Nt)
 

@@ -2,7 +2,6 @@ using Odil
 include("./trixi/tree_2d_dgsem/elixir_euler_blast_wave.jl")
 include("../src/aux/plot.jl")
 include("../src/semidiscretization/bdf.jl")
-include("../src/solvers/odil_lbfgs.jl")
 
 
 polydeg = 2
@@ -32,7 +31,8 @@ u_matrix = reduce(hcat, vec.(sol.u))
 u_exact = reshape(u_matrix, sol_shape...)
 # plot_fe_3d_time(x, y, z, e, u_exact)
 # plot_fe_3d_time_compare(x, y, z, e, u_exact, u_exact)
-res = odil_lbfgs(lhs!, ode.f, p_lhs, ode.p, Nx, ode.u0, 1:length(ode.u0), t; max_iterations = 100, u_iter0 = repeat(ode.u0, Nt), autodiff = AutoFiniteDiff())
+problem = Odil2D(lhs!, ode.f, p_lhs, ode.p, Nx, ode.u0, 1:length(ode.u0), t, x, y)
+res = odil_lbfgs(problem; max_iterations = 100, u_iter0 = repeat(ode.u0, Nt), autodiff = AutoFiniteDiff())
 
 u_approx = reshape(res, sol_shape...)
 for var in 1:variables

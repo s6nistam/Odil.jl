@@ -2,7 +2,6 @@ using Odil
 include("./trixi/tree_1d_dgsem/elixir_advection_basic.jl")
 include("../src/aux/plot.jl")
 include("../src/semidiscretization/bdf.jl")
-include("../src/solvers/odil_gauss_newton.jl")
 
 polydeg = 2
 refinement_level = 4
@@ -30,7 +29,8 @@ u_matrix = reduce(hcat, vec.(sol.u))
 u_exact = reshape(u_matrix, sol_shape...)
 # plot_fe_3d_time(x, y, z, e, u_exact)
 # plot_fe_3d_time_compare(x, y, z, e, u_exact, u_exact)
-res = odil_gauss_newton(lhs!, ode.f, p_lhs, ode.p, Nx, ode.u0, 1:length(ode.u0), t; max_iterations = 1000)
+problem = Odil1D(lhs!, ode.f, p_lhs, ode.p, Nx, ode.u0, 1:length(ode.u0), t, x)
+res = odil_gauss_newton(problem; max_iterations = 1000)
 
 u_approx = reshape(res, sol_shape...)
 

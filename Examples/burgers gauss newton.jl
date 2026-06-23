@@ -1,7 +1,6 @@
 using Odil
 include("../src/semidiscretization/burgers.jl")
 include("../src/references/burgers.jl")
-include("../src/solvers/odil_gauss_newton.jl")
 
 Nx = 32
 Nt = 32
@@ -32,7 +31,8 @@ max_iterations = 100
 p_extra = (x, Nx, dx, t, Nt, dt)
 len_extra = (Nx - 2) * (Nt - 1) * 2
 
-u = odil_gauss_newton(lhs!, rhs!, p_lhs, p_rhs, Nx, u_reference_vals, reference_val_indices, t, max_iterations = max_iterations, extra = extra, p_extra = p_extra, len_extra = len_extra)
+problem = Odil1D(lhs!, rhs!, p_lhs, p_rhs, Nx, u_reference_vals, reference_val_indices, t, x; extra = extra, p_extra = p_extra, len_extra = len_extra)
+u = odil_gauss_newton(problem; max_iterations = max_iterations)
 
 u = reshape(u, Nx, Nt)
 

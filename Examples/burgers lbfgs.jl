@@ -9,7 +9,6 @@ import Pkg
 # Pkg.add("Plots")
 include("../src/semidiscretization/burgers.jl")
 include("../src/references/burgers.jl")
-include("../src/solvers/odil_lbfgs.jl")
 
 Nx = 32
 Nt = 32
@@ -37,7 +36,8 @@ reference_val_indices = [idx_t0; idx_bounds_left; idx_bounds_right]
 
 max_iterations = 10000
 
-u = odil_lbfgs(lhs!, rhs!, p_lhs, p_rhs, Nx, u_reference_vals, reference_val_indices, t, max_iterations = max_iterations)
+problem = Odil1D(lhs!, rhs!, p_lhs, p_rhs, Nx, u_reference_vals, reference_val_indices, t, x)
+u = odil_lbfgs(problem; max_iterations = max_iterations)
 
 u = reshape(u, Nx, Nt)
 
