@@ -1,14 +1,14 @@
 using SciMLBase, NonlinearSolveFirstOrder, ADTypes, Enzyme, LinearAlgebra
 
-function odil_gauss_newton(problem::Odil; max_iterations = 2, extra = problem.extra, p_extra = problem.p_extra, len_extra = problem.len_extra, u_iter0 = problem.u_iter0, autodiff = AutoEnzyme())
-    return odil_gauss_newton(problem.lhs, problem.rhs, problem.p_lhs, problem.p_rhs, problem.N_coords, problem.u_reference_vals, problem.reference_val_indices, problem.t; max_iterations = max_iterations, extra = extra, p_extra = p_extra, len_extra = len_extra, u_iter0 = u_iter0, autodiff = autodiff)
+function odil_gauss_newton(problem::Odil; max_iterations = 2, extra = problem.extra, p_extra = problem.p_extra, len_extra = problem.len_extra, u_iter0 = problem.u_iter0, autodiff = AutoEnzyme(), problem_pass_on = nothing)
+    return odil_gauss_newton(problem.lhs, problem.rhs, problem.p_lhs, problem.p_rhs, problem.N_coords, problem.u_reference_vals, problem.reference_val_indices, problem.t; max_iterations = max_iterations, extra = extra, p_extra = p_extra, len_extra = len_extra, u_iter0 = u_iter0, autodiff = autodiff, problem = problem_pass_on)
 end
 
-odil_gauss_newton(problem::Odil1D; kwargs...) = odil_gauss_newton(base_problem(problem); kwargs...)
-odil_gauss_newton(problem::Odil2D; kwargs...) = odil_gauss_newton(base_problem(problem); kwargs...)
-odil_gauss_newton(problem::Odil3D; kwargs...) = odil_gauss_newton(base_problem(problem); kwargs...)
+odil_gauss_newton(problem::Odil1D; kwargs...) = odil_gauss_newton(base_problem(problem); problem_pass_on = problem, kwargs...)
+odil_gauss_newton(problem::Odil2D; kwargs...) = odil_gauss_newton(base_problem(problem); problem_pass_on = problem, kwargs...)
+odil_gauss_newton(problem::Odil3D; kwargs...) = odil_gauss_newton(base_problem(problem); problem_pass_on = problem, kwargs...)
 
-function odil_gauss_newton(lhs, rhs, p_lhs, p_rhs, Nx, u_reference_vals, reference_val_indices, t; max_iterations = 2, extra = nothing,  p_extra = nothing, len_extra = 0, u_iter0 = nothing, autodiff = AutoEnzyme())
+function odil_gauss_newton(lhs, rhs, p_lhs, p_rhs, Nx, u_reference_vals, reference_val_indices, t; max_iterations = 2, extra = nothing,  p_extra = nothing, len_extra = 0, u_iter0 = nothing, autodiff = AutoEnzyme(), problem = nothing)
     Nref = length(u_reference_vals)
     Nt = length(t)
     p_iter = Ref(0)
@@ -72,7 +72,7 @@ function odil_gauss_newton(lhs, rhs, p_lhs, p_rhs, Nx, u_reference_vals, referen
     # opt = LevenbergMarquardt(autodiff = autodiff, damping_initial = 0.01)
 
     callback = function (cache, iter)
-            println("Iteration ", iter, ": Loss = ", norm(cache.fu), " descent direction = ", norm(get_du(cache.descent_cache)))
+        println("Iteration ", iter, ": Loss = ", norm(cache.fu), " descent direction = ", norm(get_du(cache.descent_cache)))
         u_current = reshape(cache.u, Nx, Nt)
         # plot_1d_time(x, t, u_current)
         return false # false = Optimierung weiterlaufen lassen
