@@ -518,7 +518,7 @@ function plot(problem::Odil3D, u_state; c_min = nothing, c_max = nothing)
     variables = Int(problem.problem.N_coords/length(x))
     u_approx = reshape(u_state, (variables, size(x, 1), size(y, 2), size(z, 3), length(problem.x[1, 1, 1, :]), length(problem.problem.t)))
     for i in 1:variables
-        plot_fe_3d_time(x, y, z, e, u_approx[i, :, :, :, :]; c_min = c_min, c_max = c_max)
+        plot_fe_3d_time(x, y, z, e, u_approx[i, :, :, :, :, :]; c_min = c_min, c_max = c_max)
     end
 end
 
@@ -528,6 +528,6 @@ function plot(problem::Odil3D, u_state, u_exact; c_min = nothing, c_max = nothin
     variables = Int(problem.problem.N_coords/length(x))
     u_approx = reshape(u_state, (variables, size(x, 1), size(y, 2), size(z, 3), length(problem.x[1, 1, 1, :]), length(problem.problem.t)))
     for i in 1:variables
-        plot_fe_3d_time_compare(x, y, z, e, u_exact, u_approx[i, :, :, :, :]; c_min = c_min, c_max = c_max)
+        plot_fe_3d_time_compare(x, y, z, e, u_exact, u_approx[i, :, :, :, :, :]; c_min = c_min, c_max = c_max)
     end
 end
