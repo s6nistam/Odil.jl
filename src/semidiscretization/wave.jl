@@ -18,7 +18,7 @@ function rhs!(du, u, p, t_val)
 end
 
 function lhs!(du, u, p, it)
-    x, Nx, dx, t, Nt, dt = p 
+    Nx, t, Nt, dt = p 
     fill!(du, zero(eltype(u)))
     idx = LinearIndices((Nx, 2, Nt))
     idx_x = LinearIndices((Nx, 2))

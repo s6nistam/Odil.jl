@@ -9,7 +9,7 @@ function get_lhs(max_order::Int)
         end
     end
     lhs = (du, u, p, it) -> begin
-        x, Nx, dx, t, Nt, dt = p 
+       Nx, t, Nt, dt = p 
         dt = dt[1]
         current_order = min(it - 1, max_order)
         

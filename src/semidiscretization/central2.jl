@@ -1,5 +1,5 @@
 function lhs!(du, u, p, it)
-    x, Nx, dx, t, Nt, dt = p 
+    Nx, t, Nt, dt = p 
     fill!(du, 0.0)
     idx = LinearIndices((Nx, Nt))
     if it == Nt

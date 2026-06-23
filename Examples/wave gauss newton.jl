@@ -13,7 +13,7 @@ dt = [t[i + 1] - t[i] for i in 1:Nt-1]
 u_exact = [get_exact_wave(x[ix], t[it]) for ix in 1:Nx, it in 1:Nt]
 u_t_exact = [get_exact_wave_velocity(x[ix], t[it]) for ix in 1:Nx, it in 1:Nt]
 
-p_lhs = (x, Nx, dx, t, Nt, dt)
+p_lhs = (Nx, t, Nt, dt)
 p_rhs = (x, Nx, dx, t, Nt, dt)
 
 u_t0  = [get_exact_wave(x[ix], t[1]) for ix in 1:Nx]

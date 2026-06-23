@@ -11,7 +11,7 @@ t = range(0, 1, length=Nt)
 dx = [x[i + 1] - x[i] for i in 1:Nx-1]
 dt = [t[i + 1] - t[i] for i in 1:Nt-1]
 
-p_lhs = (x, Nx, dx, t, Nt, dt)
+p_lhs = (Nx, t, Nt, dt)
 p_rhs = (x, Nx, dx, t, Nt, dt)
 
 u_t0  = [get_initial_burgers(x[ix]) for ix in 1:Nx]
