@@ -1,8 +1,7 @@
 using GLMakie
 using ColorSchemes
 
-function plot_1d_time_comparison(x, t, u_exact, u_approx;
-    save_file = false, filename = "comparison.png")
+function plot_1d_time_comparison(x, t, u_exact, u_approx;)
 
     # We determine the min and max values to ensure both plots share the same color scale
     z_min = min(minimum(u_exact), minimum(u_approx))
@@ -24,16 +23,10 @@ function plot_1d_time_comparison(x, t, u_exact, u_approx;
     # Display the figure
     display(fig)
 
-    # Optional: Save to file
-    if save_file
-        save(filename, fig)
-    end
-
     return fig
 end
 
-function plot_1d_time(x, t, u;
-    save_file = false, filename = "solution.png")
+function plot_1d_time(x, t, u;)
 
     # We determine the min and max values
     z_min = minimum(u)
@@ -52,16 +45,11 @@ function plot_1d_time(x, t, u;
     # Display the figure
     display(fig)
 
-    # Optional: Save to file
-    if save_file
-        save(filename, fig)
-    end
-
     return fig
 end
 
 function plot_fe_1d_time(x, e, u;
-    save_file = false, filename = "solution.png", c_min = nothing, c_max = nothing)
+    c_min = nothing, c_max = nothing)
 
     fig = Figure(size = (400, 400))
     it = Observable(1)
@@ -102,15 +90,11 @@ function plot_fe_1d_time(x, e, u;
 
     display(fig)
 
-    if save_file
-        save(filename, fig)
-    end
-
     return fig
 end
 
 function plot_fe_1d_time_compare(x, e, u_exact, u_approx;
-    save_file = false, filename = "solution.png", c_min = nothing, c_max = nothing)
+    c_min = nothing, c_max = nothing)
 
     # Create a new figure
     fig = Figure(size = (800, 400))
@@ -165,15 +149,11 @@ function plot_fe_1d_time_compare(x, e, u_exact, u_approx;
 
     display(fig)
 
-    if save_file
-        save(filename, fig)
-    end
-
     return fig
 end
 
 function plot_fe_2d_time(x, y, e, u;
-    save_file = false, filename = "solution.png", c_min = nothing, c_max = nothing)
+    c_min = nothing, c_max = nothing)
 
     # Create a new figure
     fig = Figure(size = (400, 400))
@@ -217,15 +197,11 @@ function plot_fe_2d_time(x, y, e, u;
 
     display(fig)
 
-    if save_file
-        save(filename, fig)
-    end
-
     return fig
 end
 
 function plot_fe_2d_time_compare(x, y, e, u_exact, u_approx;
-    save_file = false, filename = "solution.png", c_min = nothing, c_max = nothing)
+    c_min = nothing, c_max = nothing)
 
     # Create a new figure
     fig = Figure(size = (800, 400))
@@ -280,10 +256,6 @@ function plot_fe_2d_time_compare(x, y, e, u_exact, u_approx;
     end
 
     display(fig)
-
-    if save_file
-        save(filename, fig)
-    end
 
     return fig
 end
@@ -344,7 +316,7 @@ function interpolate_to_equidistant(x, y, z, u)
 end
 
 function plot_fe_3d_time(x, y, z, e, u;
-    save_file = false, filename = "solution.png", c_min = nothing, c_max = nothing)
+    c_min = nothing, c_max = nothing)
 
     # Create a new figure
     fig = Figure(size = (400, 400))
@@ -408,16 +380,11 @@ function plot_fe_3d_time(x, y, z, e, u;
     # Display the figure
     display(fig)
 
-    # Optional: Save to file
-    if save_file
-        save(filename, fig)
-    end
-
     return fig
 end
 
 function plot_fe_3d_time_compare(x, y, z, e, u_exact, u_approx;
-    save_file = false, filename = "solution.png", c_min = nothing, c_max = nothing)
+    c_min = nothing, c_max = nothing)
 
     # Create a new figure
     fig = Figure(size = (800, 400))
@@ -502,10 +469,65 @@ function plot_fe_3d_time_compare(x, y, z, e, u_exact, u_approx;
     # Display the figure
     display(fig)
 
-    # Optional: Save to file
-    if save_file
-        save(filename, fig)
-    end
-
     return fig
+end
+
+function plot(problem::Odil1D, u_state; c_min = nothing, c_max = nothing)
+    x = problem.x
+    e = 1:length(problem.x[1, :])
+    variables = Int(problem.problem.N_coords/length(x))
+    u_approx = reshape(u_state, (variables, size(x, 1), length(problem.x[1, :]), length(problem.problem.t)))
+    for i in 1:variables
+        plot_fe_1d_time(x, e, u_approx[i, :, :, :]; c_min = c_min, c_max = c_max)
+    end
+end
+
+function plot(problem::Odil1D, u_state, u_exact; c_min = nothing, c_max = nothing)
+    x = problem.x
+    e = 1:length(problem.x[1, :])
+    variables = Int(problem.problem.N_coords/length(x))
+    u_approx = reshape(u_state, (variables, size(x, 1), length(problem.x[1, :]), length(problem.problem.t)))
+    for i in 1:variables
+        plot_fe_1d_time_compare(x, e, u_exact, u_approx[i, :, :, :]; c_min = c_min, c_max = c_max)
+    end
+end
+
+function plot(problem::Odil2D, u_state; c_min = nothing, c_max = nothing)
+    x, y = problem.x, problem.y
+    e = 1:length(problem.x[1, 1, :])
+    variables = Int(problem.problem.N_coords/length(x))
+    u_approx = reshape(u_state, (variables, size(x, 1), size(y, 2), length(problem.x[1, 1, :]), length(problem.problem.t)))
+    for i in 1:variables
+        plot_fe_2d_time(x, y, e, u_approx[i, :, :, :, :]; c_min = c_min, c_max = c_max)
+    end
+end
+
+function plot(problem::Odil2D, u_state, u_exact; c_min = nothing, c_max = nothing)
+    x, y = problem.x, problem.y
+    e = 1:length(problem.x[1, 1, :])
+    variables = Int(problem.problem.N_coords/length(x))
+    u_approx = reshape(u_state, (variables, size(x, 1), size(y, 2), length(problem.x[1, 1, :]), length(problem.problem.t)))
+    for i in 1:variables
+        plot_fe_2d_time_compare(x, y, e, u_exact, u_approx[i, :, :, :, :]; c_min = c_min, c_max = c_max)
+    end
+end
+
+function plot(problem::Odil3D, u_state; c_min = nothing, c_max = nothing)
+    x, y, z = problem.x, problem.y, problem.z
+    e = 1:length(problem.x[1, 1, 1, :])
+    variables = Int(problem.problem.N_coords/length(x))
+    u_approx = reshape(u_state, (variables, size(x, 1), size(y, 2), size(z, 3), length(problem.x[1, 1, 1, :]), length(problem.problem.t)))
+    for i in 1:variables
+        plot_fe_3d_time(x, y, z, e, u_approx[i, :, :, :, :]; c_min = c_min, c_max = c_max)
+    end
+end
+
+function plot(problem::Odil3D, u_state, u_exact; c_min = nothing, c_max = nothing)
+    x, y, z = problem.x, problem.y, problem.z
+    e = 1:length(problem.x[1, 1, 1, :])
+    variables = Int(problem.problem.N_coords/length(x))
+    u_approx = reshape(u_state, (variables, size(x, 1), size(y, 2), size(z, 3), length(problem.x[1, 1, 1, :]), length(problem.problem.t)))
+    for i in 1:variables
+        plot_fe_3d_time_compare(x, y, z, e, u_exact, u_approx[i, :, :, :, :]; c_min = c_min, c_max = c_max)
+    end
 end

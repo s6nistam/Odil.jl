@@ -73,7 +73,8 @@ function odil_gauss_newton(lhs, rhs, p_lhs, p_rhs, Nx, u_reference_vals, referen
 
     callback = function (cache, iter)
         println("Iteration ", iter, ": Loss = ", norm(cache.fu), " descent direction = ", norm(get_du(cache.descent_cache)))
-        u_current = reshape(cache.u, Nx, Nt)
+        
+        plot(problem, cache.u)
         # plot_1d_time(x, t, u_current)
         return false # false = Optimierung weiterlaufen lassen
     end
@@ -86,7 +87,9 @@ function odil_gauss_newton(lhs, rhs, p_lhs, p_rhs, Nx, u_reference_vals, referen
         p_iter[] = iter
         step!(cache)
         
-        callback(cache, iter)
+        if iter % 50 == 0 || iter == 1
+            callback(cache, iter)
+        end
         
         if cache.retcode != SciMLBase.ReturnCode.Default
             break

@@ -12,6 +12,7 @@ include("references/wave.jl")
 export Odil, Odil1D, Odil2D, Odil3D
 export odil_gauss_newton, odil_lbfgs
 export AutoEnzyme, AutoFiniteDiff
+export plot
 export plot_1d_time_comparison
 export plot_1d_time
 export plot_fe_1d_time_compare
