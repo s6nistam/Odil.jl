@@ -24,9 +24,11 @@ sol_shape = (variables, (polydeg + 1 for _ in 1:ndims)..., (2^refinement_level)^
 u_matrix = reduce(hcat, vec.(sol.u))
 u_exact = reshape(u_matrix, sol_shape...)
 problem = Odil1D(lhs, ode.f, p_lhs, ode.p, Nx, ode.u0, 1:length(ode.u0), t, x)
-res = odil_gauss_newton(problem; max_iterations = 1000)
+res = odil_gauss_newton(problem; max_iterations = 200)
 
 u_approx = reshape(res, sol_shape...)
 for var in 1:variables
     plot_fe_1d_time_compare(x, e, u_exact[var, :, :, :], u_approx[var, :, :, :], c_min = 0.0, c_max = 1.5)
 end
+
+write_vtk(problem, res, "odil_1d_advection_structured_gauss_newton")

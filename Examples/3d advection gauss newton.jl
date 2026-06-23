@@ -35,3 +35,5 @@ u_approx = reshape(res, sol_shape...)
 for var in 1:variables
     plot_fe_3d_time_compare(x, y, z, e, u_exact[var, :, :, :, :, :], u_approx[var, :, :, :, :, :], c_min = 0.0, c_max = 1.5)
 end
+
+write_vtk(problem, res, "odil_3d_advection_gauss_newton")
