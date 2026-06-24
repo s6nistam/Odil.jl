@@ -2,7 +2,7 @@
 
 julia_version = "1.12.6"
 manifest_format = "2.0"
-project_hash = "76d729c01a537d8e7fc9b14fa0a57a269c23e4f5"
+project_hash = "73ad0d8edab7865df4c0262ed0c6aa4044d00852"
 
 [[deps.ADTypes]]
 git-tree-sha1 = "bbc22a9a08a0ef6460041086d8a7b27940ed4ffd"
@@ -1932,7 +1932,7 @@ version = "0.3.29"
     HyperDualNumbers = "50ceba7f-c3ee-5a84-a6e8-3ad40456ec97"
 
 [[deps.Odil]]
-deps = ["ADTypes", "ColorSchemes", "Enzyme", "FiniteDifferences", "GLMakie", "LinearAlgebra", "Morton", "NLSolversBase", "NonlinearSolveFirstOrder", "Optim", "OptimizationBase", "OptimizationLBFGSB", "OptimizationOptimJL", "Plots", "ReadVTK", "SciMLBase", "WriteVTK", "Zygote"]
+deps = ["ADTypes", "ColorSchemes", "Enzyme", "FiniteDifferences", "GLMakie", "HDF5", "LinearAlgebra", "Morton", "NLSolversBase", "NonlinearSolveFirstOrder", "Optim", "OptimizationBase", "OptimizationLBFGSB", "OptimizationOptimJL", "Plots", "ReadVTK", "SciMLBase", "WriteVTK", "Zygote"]
 path = ".."
 uuid = "c15e9705-4550-4157-9636-e6a06c04b4f1"
 version = "0.1.0-DEV"
