@@ -8,6 +8,10 @@ function write_vtk(problem::Odil1D, u, filename::String)
     Ne = length(x[1, :])
     Nx = length(x[:, 1])
     variables = Int(N_coords/(Nx * Ne))
+    it_last = Int(length(u) / (variables * Nx * Ne))
+    t = t[1:it_last]
+    Nt = length(t)
+
     u_reshaped = reshape(u, (variables, Nx * Ne, Nt))
 
     vtk_grid(filename, vec(x), t) do vtk
@@ -28,7 +32,12 @@ function write_vtk(problem::Odil2D, u, filename::String)
     Nx = length(x[:, 1, 1])
     Ny = length(y[1, :, 1])
     variables = Int(N_coords/(Nx * Ny * Ne))
+    it_last = Int(length(u) / (variables * Nx * Ny * Ne))
+    t = t[1:it_last]
+    Nt = length(t)
+    
     u_linear = reshape(u, variables, Nx, Ny, Ne, Nt)
+
     u_cartesian = zeros(eltype(u), variables, Nx, Ny, Ne_per_dim, Ne_per_dim, Nt)
     x_cartesian = zeros(eltype(x), Nx, Ny, Ne_per_dim, Ne_per_dim)
     y_cartesian = zeros(eltype(y), Nx, Ny, Ne_per_dim, Ne_per_dim)
@@ -47,7 +56,7 @@ function write_vtk(problem::Odil2D, u, filename::String)
 
     paraview_collection(filename) do pvd
         for (i, it) in enumerate(eachindex(t))
-            vtk_grid("timestep_$i", vec(x_re[:, 1, :, 1]), vec(y_re[1, :, 1, :])) do vtk
+            vtk_grid("$filename" * "_$i", vec(x_re[:, 1, :, 1]), vec(y_re[1, :, 1, :])) do vtk
                 for var in 1:variables
                     vtk["u_$var"] = u_reshaped[var, :, :, it]
                 end
@@ -63,13 +72,15 @@ function write_vtk(problem::Odil3D, u, filename::String)
     z = problem.z
     t = problem.problem.t
     N_coords = problem.problem.N_coords
-    Nt = length(t)
     Ne = length(x[1, 1, 1, :])
     Ne_per_dim = Int(round(Ne^(1/3)))
     Nx = length(x[:, 1, 1, 1])
     Ny = length(y[1, :, 1, 1])
     Nz = length(z[1, 1, :, 1])
     variables = Int(N_coords / (Nx * Ny * Nz * Ne))
+    it_last = Int(length(u) / (variables * Nx * Ny * Nz * Ne))
+    t = t[1:it_last]
+    Nt = length(t)
 
     u_linear = reshape(u, variables, Nx, Ny, Nz, Ne, Nt)
     
@@ -100,7 +111,7 @@ function write_vtk(problem::Odil3D, u, filename::String)
 
     paraview_collection(filename) do pvd
         for (i, it) in enumerate(eachindex(t))
-            vtk_grid("timestep_$i", x_global[:, 1, 1], y_global[1, :, 1], z_global[1, 1, :]) do vtk
+            vtk_grid("$filename" * "_$i", x_global[:, 1, 1], y_global[1, :, 1], z_global[1, 1, :]) do vtk
                 for var in 1:variables
                     vtk["u_$var"] = u_reshaped[var, :, :, :, it]
                 end
