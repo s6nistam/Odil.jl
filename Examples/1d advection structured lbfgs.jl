@@ -23,7 +23,7 @@ sol_shape = (variables, (polydeg + 1 for _ in 1:ndims)..., (2^refinement_level)^
 
 u_matrix = reduce(hcat, vec.(sol.u))
 u_exact = reshape(u_matrix, sol_shape...)
-problem = Odil1D(lhs, ode.f, p_lhs, ode.p, Nx, ode.u0, 1:length(ode.u0), t, x)
+problem = OdilProblem(lhs, ode.f, p_lhs, ode.p, Nx, ode.u0, 1:length(ode.u0), t, x)
 # res = odil_lbfgs(problem; max_iterations = 1000, autodiff = AutoFiniteDiff())
 res = odil_lbfgs(problem; max_iterations = 1000)
 

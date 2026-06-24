@@ -10,7 +10,7 @@ include("aux/vtk.jl")
 include("semidiscretization/wave.jl")
 include("references/wave.jl")
 
-export Odil, Odil1D, Odil2D, Odil3D
+export OdilProblem
 export odil_gauss_newton, odil_lbfgs
 export AutoEnzyme, AutoFiniteDiff
 export plot

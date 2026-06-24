@@ -31,7 +31,7 @@ max_iterations = 100
 p_extra = (x, Nx, dx, t, Nt, dt)
 len_extra = (Nx - 2) * (Nt - 1) * 2
 
-problem = Odil1D(lhs!, rhs!, p_lhs, p_rhs, Nx, u_reference_vals, reference_val_indices, t, x; extra = extra, p_extra = p_extra, len_extra = len_extra)
+problem = OdilProblem(lhs!, rhs!, p_lhs, p_rhs, Nx, u_reference_vals, reference_val_indices, t, x; extra = extra, p_extra = p_extra, len_extra = len_extra)
 u = odil_gauss_newton(problem; max_iterations = max_iterations)
 
 u = reshape(u, Nx, Nt)

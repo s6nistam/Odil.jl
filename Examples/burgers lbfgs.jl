@@ -36,7 +36,7 @@ reference_val_indices = [idx_t0; idx_bounds_left; idx_bounds_right]
 
 max_iterations = 10000
 
-problem = Odil1D(lhs!, rhs!, p_lhs, p_rhs, Nx, u_reference_vals, reference_val_indices, t, x)
+problem = OdilProblem(lhs!, rhs!, p_lhs, p_rhs, Nx, u_reference_vals, reference_val_indices, t, x)
 u = odil_lbfgs(problem; max_iterations = max_iterations)
 
 u = reshape(u, Nx, Nt)

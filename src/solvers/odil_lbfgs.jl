@@ -1,12 +1,8 @@
 using SciMLBase, OptimizationBase, OptimizationOptimJL, ADTypes, Enzyme, LinearAlgebra
 
-function odil_lbfgs(problem::Odil; max_iterations = 100000, extra = problem.extra, p_extra = problem.p_extra, len_extra = problem.len_extra, u_iter0 = problem.u_iter0, autodiff = AutoEnzyme(), problem_pass_on = nothing)
-    return odil_lbfgs(problem.lhs, problem.rhs, problem.p_lhs, problem.p_rhs, problem.N_coords, problem.u_reference_vals, problem.reference_val_indices, problem.t; max_iterations = max_iterations, extra = extra, p_extra = p_extra, len_extra = len_extra, u_iter0 = u_iter0, autodiff = autodiff, problem = problem_pass_on)
+function odil_lbfgs(problem::OdilProblem; max_iterations = 100000, extra = problem.extra, p_extra = problem.p_extra, len_extra = problem.len_extra, u_iter0 = problem.u_iter0, autodiff = AutoEnzyme())
+    return odil_lbfgs(problem.lhs, problem.rhs, problem.p_lhs, problem.p_rhs, problem.N_coords, problem.u_reference_vals, problem.reference_val_indices, problem.t; max_iterations = max_iterations, extra = extra, p_extra = p_extra, len_extra = len_extra, u_iter0 = u_iter0, autodiff = autodiff, problem = problem)
 end
-
-odil_lbfgs(problem::Odil1D; kwargs...) = odil_lbfgs(base_problem(problem); problem_pass_on = problem, kwargs...)
-odil_lbfgs(problem::Odil2D; kwargs...) = odil_lbfgs(base_problem(problem); problem_pass_on = problem, kwargs...)
-odil_lbfgs(problem::Odil3D; kwargs...) = odil_lbfgs(base_problem(problem); problem_pass_on = problem, kwargs...)
 
 function odil_lbfgs(lhs, rhs, p_lhs, p_rhs, Nx, u_reference_vals, reference_val_indices, t; extra = nothing,  p_extra = nothing, len_extra = 0, u_iter0 = nothing, max_iterations = 100000, autodiff = AutoEnzyme(), problem = nothing)
     Nref = length(u_reference_vals)

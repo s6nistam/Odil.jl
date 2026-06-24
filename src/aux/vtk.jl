@@ -1,9 +1,9 @@
 using WriteVTK, ReadVTK, Morton
 
-function write_vtk(problem::Odil1D, u, filename::String)
-    x = problem.x
-    t = problem.problem.t
-    N_coords = problem.problem.N_coords
+function write_vtk(problem::OdilProblem{1}, u, filename::String)
+    (x,) = problem.xyz
+    t = problem.t
+    N_coords = problem.N_coords
     Nt = length(t)
     Ne = length(x[1, :])
     Nx = length(x[:, 1])
@@ -21,11 +21,10 @@ function write_vtk(problem::Odil1D, u, filename::String)
     end
 end
 
-function write_vtk(problem::Odil2D, u, filename::String)
-    x = problem.x
-    y = problem.y
-    t = problem.problem.t
-    N_coords = problem.problem.N_coords
+function write_vtk(problem::OdilProblem{2}, u, filename::String)
+    x, y = problem.xyz
+    t = problem.t
+    N_coords = problem.N_coords
     Nt = length(t)
     Ne = length(x[1, 1, :])
     Ne_per_dim = Int(round(sqrt(Ne)))
@@ -66,12 +65,10 @@ function write_vtk(problem::Odil2D, u, filename::String)
     end
 end
 
-function write_vtk(problem::Odil3D, u, filename::String)
-    x = problem.x
-    y = problem.y
-    z = problem.z
-    t = problem.problem.t
-    N_coords = problem.problem.N_coords
+function write_vtk(problem::OdilProblem{3}, u, filename::String)
+    x, y, z = problem.xyz
+    t = problem.t
+    N_coords = problem.N_coords
     Ne = length(x[1, 1, 1, :])
     Ne_per_dim = Int(round(Ne^(1/3)))
     Nx = length(x[:, 1, 1, 1])
