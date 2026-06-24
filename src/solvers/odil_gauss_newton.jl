@@ -32,7 +32,7 @@ function odil_gauss_newton(lhs, rhs, p_lhs, p_rhs, Nx, u_reference_vals, referen
         du_rhs = zeros(eltype(u_vec), Nx_inner)
         du_lhs = zeros(eltype(u_vec), Nx_inner)
 
-        for it in 2:Nt_inner #TODO: bis Nt_inner laufen lassen
+        for it in 2:Nt_inner
             fill!(du_rhs, 0.0)
             fill!(du_lhs, 0.0)
 
