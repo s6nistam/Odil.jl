@@ -39,5 +39,5 @@ end
 
 struct OdilState{T}
     u::Vector{T}
-    it_next::Int
+    it_last::Int
 end

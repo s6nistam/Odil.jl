@@ -1,10 +1,10 @@
 using SciMLBase, OptimizationBase, OptimizationOptimJL, ADTypes, Enzyme, LinearAlgebra
 
-function odil_lbfgs(problem::OdilProblem; max_iterations = 100000, extra = problem.extra, p_extra = problem.p_extra, len_extra = problem.len_extra, u_iter0 = problem.u_iter0, autodiff = AutoEnzyme())
-    return odil_lbfgs(problem.lhs, problem.rhs, problem.p_lhs, problem.p_rhs, problem.N_coords, problem.u_reference_vals, problem.reference_val_indices, problem.t; max_iterations = max_iterations, extra = extra, p_extra = p_extra, len_extra = len_extra, u_iter0 = u_iter0, autodiff = autodiff, problem = problem)
+function odil_lbfgs(problem::OdilProblem; max_iterations = 100000, extra = problem.extra, p_extra = problem.p_extra, len_extra = problem.len_extra, u_iter0 = problem.u_iter0, autodiff = AutoEnzyme(), info_prints = true)
+    return odil_lbfgs(problem.lhs, problem.rhs, problem.p_lhs, problem.p_rhs, problem.N_coords, problem.u_reference_vals, problem.reference_val_indices, problem.t; max_iterations = max_iterations, extra = extra, p_extra = p_extra, len_extra = len_extra, u_iter0 = u_iter0, autodiff = autodiff, problem = problem, info_prints = info_prints)
 end
 
-function odil_lbfgs(lhs, rhs, p_lhs, p_rhs, Nx, u_reference_vals, reference_val_indices, t; extra = nothing,  p_extra = nothing, len_extra = 0, u_iter0 = nothing, max_iterations = 100000, autodiff = AutoEnzyme(), problem = nothing)
+function odil_lbfgs(lhs, rhs, p_lhs, p_rhs, Nx, u_reference_vals, reference_val_indices, t; extra = nothing,  p_extra = nothing, len_extra = 0, u_iter0 = nothing, max_iterations = 100000, autodiff = AutoEnzyme(), problem = nothing, info_prints = true)
     Nref = length(u_reference_vals)
     Nt = length(t)
     num_unknowns = Nx * Nt
@@ -78,10 +78,14 @@ function odil_lbfgs(lhs, rhs, p_lhs, p_rhs, Nx, u_reference_vals, reference_val_
         return false
     end
     
-    println("Starte Lösung...")
+    if info_prints
+        println("Starte Lösung...")
+    end
     res = solve(prob, opt, maxiters = max_iterations, callback = callback)
     
-    println("Optimierung beendet!")
-    println("Return Code: ", res.retcode)
+    if info_prints
+        println("Optimierung beendet!")
+        println("Return Code: ", res.retcode)
+    end
     return res.u
 end
