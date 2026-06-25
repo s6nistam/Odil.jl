@@ -3,7 +3,6 @@ include("./trixi/tree_2d_dgsem/elixir_euler_blast_wave.jl")
 include("../src/aux/plot.jl")
 include("../src/semidiscretization/bdf.jl")
 
-
 polydeg = 2
 refinement_level = 3
 ndims = 2

@@ -2,7 +2,6 @@ using Odil
 include("./trixi/tree_2d_dgsem/elixir_advection_basic.jl")
 include("../src/aux/plot.jl")
 include("../src/semidiscretization/bdf.jl")
-# include("../src/semidiscretization/implicit euler.jl")
 
 polydeg = 2
 refinement_level = 3

@@ -1,12 +1,4 @@
 using Odil
-import Pkg
-# Pkg.add("SciMLBase")
-# Pkg.add("OptimizationBase")
-# Pkg.add("OptimizationOptimJL")
-# Pkg.add("ADTypes")
-# Pkg.add("Enzyme")
-# Pkg.add("ColorSchemes")
-# Pkg.add("Plots")
 include("../src/semidiscretization/burgers.jl")
 include("../src/references/burgers.jl")
 

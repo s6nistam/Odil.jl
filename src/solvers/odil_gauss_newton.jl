@@ -70,8 +70,7 @@ function odil_gauss_newton(lhs, rhs, p_lhs, p_rhs, Nx, u_reference_vals, referen
         println("Iteration ", iter, ": Loss = ", norm(cache.fu), " descent direction = ", norm(get_du(cache.descent_cache)))
         
         plot(problem, cache.u)
-        # plot_1d_time(x, t, u_current)
-        return false # false = Optimierung weiterlaufen lassen
+        return false 
     end
     
     if info_prints

@@ -37,7 +37,6 @@ function odil_lbfgs(lhs, rhs, p_lhs, p_rhs, Nx, u_reference_vals, reference_val_
             u_rhs = @view(u_vec[((it - 2) * Nx_inner + 1):((it - 1) * Nx_inner)])
             
             t_val = t_inner[it - 1]
-            # t_val_next = t_inner[it + 1]
             rhs_inner(du_rhs, u_rhs, p_rhs_inner, t_val)
             lhs_inner(du_lhs, u_vec, p_lhs_inner, it)
             
@@ -65,15 +64,10 @@ function odil_lbfgs(lhs, rhs, p_lhs, p_rhs, Nx, u_reference_vals, reference_val_
 
     callback = function (state, l)
         iter = state.iter
-        # if iter == 1
-        #     println("Gradient= ", state.grad)
-        # end
         if state.iter % 10 == 0 || state.iter == 1
             println("Iteration ", state.iter, ": Loss = ", l, " Loss gradient = ", norm(state.grad))
 
             plot(problem, state.u)
-            # u_current = reshape(state.u, Nx, Nt)
-            # plot_1d_time(x, t, u_current)
         end
         return false
     end

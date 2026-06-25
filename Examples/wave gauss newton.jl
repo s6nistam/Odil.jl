@@ -1,5 +1,6 @@
 using Odil
 include("../src/semidiscretization/wave.jl")
+include("../src/references/wave.jl")
 
 Nx = 32
 Nt = 32
