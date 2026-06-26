@@ -13,6 +13,7 @@ include("aux/vtk.jl")
 export OdilProblem, OdilState
 export odil_gauss_newton, odil_lbfgs
 export odil_timestepping
+export reconstruct_solution_from_chunks
 export AutoEnzyme, AutoFiniteDiff
 export plot
 export plot_1d_time_comparison
