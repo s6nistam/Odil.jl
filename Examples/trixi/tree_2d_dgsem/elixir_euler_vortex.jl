@@ -56,7 +56,7 @@ initial_condition = initial_condition_isentropic_vortex
 # To ensure that every example still runs we specify explicitly `FluxLaxFriedrichs(max_abs_speed_naive)`.
 # We remark, however, that the now default `max_abs_speed` is in general recommended due to compliance with the 
 # `StepsizeCallback` (CFL-Condition) and less diffusion.
-solver = DGSEM(polydeg = 1, surface_flux = FluxLaxFriedrichs(max_abs_speed_naive))
+solver = DGSEM(polydeg = 3, surface_flux = FluxLaxFriedrichs(max_abs_speed_naive))
 
 coordinates_min = (-10.0, -10.0)
 coordinates_max = (10.0, 10.0)
@@ -102,7 +102,7 @@ callbacks = CallbackSet(summary_callback,
 # run the simulation
 
 sol = solve(ode, CarpenterKennedy2N54(williamson_condition = false);
-            dt = 0.01, # solve needs some value here but it will be overwritten by the stepsize_callback
+            dt = 0.001, # solve needs some value here but it will be overwritten by the stepsize_callback
             ode_default_options()...,
             save_everystep = true,
             callback = callbacks);
