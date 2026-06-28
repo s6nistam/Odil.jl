@@ -1,9 +1,9 @@
-using SciMLBase, NonlinearSolveFirstOrder, ADTypes, Enzyme, LinearAlgebra
+using SciMLBase, NonlinearSolveFirstOrder, ADTypes, Enzyme, LinearAlgebra, Symbolics, SparseDiffTools, SparseArrays, SparseMatrixColorings
 
-function odil_gauss_newton(problem::OdilProblem; max_iterations = 2, extra = problem.extra, p_extra = problem.p_extra, len_extra = problem.len_extra, u_iter0 = problem.u_iter0, autodiff = AutoEnzyme(), info_prints = true)
-    return odil_gauss_newton(problem.lhs, problem.rhs, problem.p_lhs, problem.p_rhs, problem.N_coords, problem.u_reference_vals, problem.reference_val_indices, problem.t; max_iterations = max_iterations, extra = extra, p_extra = p_extra, len_extra = len_extra, u_iter0 = u_iter0, autodiff = autodiff, problem = problem, info_prints = info_prints)
+function odil_gauss_newton(problem::OdilProblem; max_iterations = 2, extra = problem.extra, p_extra = problem.p_extra, len_extra = problem.len_extra, u_iter0 = problem.u_iter0, autodiff = AutoEnzyme(), info_prints = true, jac_sparse = nothing, colors = nothing)
+    return odil_gauss_newton(problem.lhs, problem.rhs, problem.p_lhs, problem.p_rhs, problem.N_coords, problem.u_reference_vals, problem.reference_val_indices, problem.t; max_iterations = max_iterations, extra = extra, p_extra = p_extra, len_extra = len_extra, u_iter0 = u_iter0, autodiff = autodiff, problem = problem, info_prints = info_prints, jac_sparse = jac_sparse, colors = colors)
 end
-function odil_gauss_newton(lhs, rhs, p_lhs, p_rhs, Nx, u_reference_vals, reference_val_indices, t; max_iterations = 2, extra = nothing,  p_extra = nothing, len_extra = 0, u_iter0 = nothing, autodiff = AutoEnzyme(), problem = nothing, info_prints = true)
+function odil_gauss_newton(lhs, rhs, p_lhs, p_rhs, Nx, u_reference_vals, reference_val_indices, t; max_iterations = 2, extra = nothing,  p_extra = nothing, len_extra = 0, u_iter0 = nothing, autodiff = AutoEnzyme(), problem = nothing, info_prints = true, jac_sparse = nothing, colors = nothing)
     Nref = length(u_reference_vals)
     Nt = length(t)
     p_iter = Ref(0)
@@ -60,8 +60,19 @@ function odil_gauss_newton(lhs, rhs, p_lhs, p_rhs, Nx, u_reference_vals, referen
 
         return nothing
     end
+
+    if jac_sparse === nothing
+        if info_prints
+            println("Computing Jacobian sparsity pattern...")
+        end
+        jac_sparse = get_jac_sparsity(lhs, p_lhs, Nref, Nx, Nt, reference_val_indices, extra, p_extra, len_extra, u_iter0)
+    end
+
+    if colors === nothing
+        colors = matrix_colors(jac_sparse)
+    end
     
-    optf = NonlinearFunction(operator_loss!, resid_prototype = resid_prototype)
+    optf = NonlinearFunction(operator_loss!, resid_prototype = resid_prototype, jac_prototype = jac_sparse, colorvec = colors)
     prob = NonlinearLeastSquaresProblem(optf, u_iter0, p_all)
     opt = GaussNewton(autodiff = autodiff)
     # opt = LevenbergMarquardt(autodiff = autodiff, damping_initial = 0.01)
