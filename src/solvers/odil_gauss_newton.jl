@@ -65,7 +65,7 @@ function odil_gauss_newton(lhs, rhs, p_lhs, p_rhs, Nx, u_reference_vals, referen
         if info_prints
             println("Computing Jacobian sparsity pattern...")
         end
-        jac_sparse = get_jac_sparsity(lhs, p_lhs, Nref, Nx, Nt, reference_val_indices, extra, p_extra, len_extra, u_iter0)
+        jac_sparse = get_jac_sparsity(lhs, p_lhs, rhs, p_rhs, t, Nref, Nx, Nt, reference_val_indices, extra, p_extra, len_extra, u_iter0)
     end
 
     if colors === nothing

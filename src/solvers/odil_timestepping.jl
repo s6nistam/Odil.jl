@@ -15,7 +15,7 @@ function odil_timestepping(problem::OdilProblem, odil_func, filename_prefix; t_c
 
     if odil_func == odil_gauss_newton
         println("Computing Jacobian sparsity pattern...")
-        jac_sparse = get_jac_sparse(problem.lhs, problem.p_lhs, Nref, N_coords, t_chunk_size, problem.reference_val_indices, problem.extra, problem.p_extra, problem.len_extra, u_iter0)
+        jac_sparse = get_jac_sparse(problem.lhs, problem.p_lhs, problem.rhs, problem.p_rhs, problem.t, Nref, N_coords, t_chunk_size, problem.reference_val_indices, problem.extra, problem.p_extra, problem.len_extra, u_iter0)
         println("Computing coloring for Jacobian sparsity pattern...")
         colors = matrix_colors(jac_sparse)
     end

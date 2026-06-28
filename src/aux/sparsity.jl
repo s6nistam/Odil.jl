@@ -1,19 +1,39 @@
-function get_jac_sparse(lhs, p_lhs, Nref, Nx, Nt, reference_val_indices, extra, p_extra, len_extra, u_iter0)
+function get_jac_sparse(lhs, p_lhs, rhs, p_rhs, t, Nref, Nx, Nt, reference_val_indices, extra, p_extra, len_extra, u_iter0)
     I = Int[]
     J = Int[]
     for i in 1:Nref
         push!(I, i)
         push!(J, reference_val_indices[i])
     end
-
+    u0 = u_iter0[1:Nx]
+    du_out = zeros(eltype(u0), Nx)
+    jac_rhs = zeros(eltype(u0), Nx, Nx)
+    
+    for i in 1:Nx
+        d_u = zeros(eltype(u0), Nx)
+        d_u[i] = 1.0 
+        d_du = zeros(eltype(u0), Nx)
+        
+        # KEY: Use Enzyme.Const(rhs) to force it to treat the Trixi object as a black box.
+        # This prevents it from trying to analyze the 'store ptr' mutation inside Trixi.
+        Enzyme.autodiff(
+            Enzyme.Forward, 
+            Enzyme.Const(rhs), 
+            Enzyme.Duplicated(du_out, d_du), 
+            Enzyme.Duplicated(u0, d_u), 
+            Enzyme.Const(p_rhs), 
+            Enzyme.Const(t[1])
+        )
+        jac_rhs[:, i] = d_du
+    end
+    jac_rhs_bool = sparse(jac_rhs .!= 0)
+    I_rhs, J_rhs, _ = findnz(jac_rhs_bool)
     for it in 2:Nt
-        for ix in 1:Nx
-            row = Nref + (it - 2) * Nx + ix
-            for jx in 1:Nx
-                col = (it - 2) * Nx + jx
-                push!(I, row)
-                push!(J, col)
-            end
+        for k in eachindex(I_rhs)
+            row = Nref + (it - 2) * Nx + I_rhs[k]
+            col = J_rhs[k]
+            push!(I, row)
+            push!(J, col)
         end
 
         lhs_wrapper! = (du, u) -> lhs(du, u, p_lhs, it)
