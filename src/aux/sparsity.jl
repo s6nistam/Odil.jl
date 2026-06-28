@@ -14,8 +14,6 @@ function get_jac_sparse(lhs, p_lhs, rhs, p_rhs, t, Nref, Nx, Nt, reference_val_i
         d_u[i] = 1.0 
         d_du = zeros(eltype(u0), Nx)
         
-        # KEY: Use Enzyme.Const(rhs) to force it to treat the Trixi object as a black box.
-        # This prevents it from trying to analyze the 'store ptr' mutation inside Trixi.
         Enzyme.autodiff(
             Enzyme.Forward, 
             Enzyme.Const(rhs), 
