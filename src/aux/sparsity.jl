@@ -5,7 +5,7 @@ function get_jac_sparse(lhs, p_lhs, rhs, p_rhs, t, Nref, Nx, Nt, reference_val_i
         push!(I, i)
         push!(J, reference_val_indices[i])
     end
-    u0 = u_iter0[1:Nx]
+    u0 = rand(eltype(u_iter0), Nx) .+ 0.1
     du_out = zeros(eltype(u0), Nx)
     jac_rhs = zeros(eltype(u0), Nx, Nx)
     
@@ -29,7 +29,7 @@ function get_jac_sparse(lhs, p_lhs, rhs, p_rhs, t, Nref, Nx, Nt, reference_val_i
     for it in 2:Nt
         for k in eachindex(I_rhs)
             row = Nref + (it - 2) * Nx + I_rhs[k]
-            col = J_rhs[k]
+            col = (it - 2) * Nx + J_rhs[k]
             push!(I, row)
             push!(J, col)
         end
