@@ -11,11 +11,11 @@ function odil_gauss_newton(lhs, rhs, p_lhs, p_rhs, Nx, u_reference_vals, referen
         u_iter0 = zeros(Nx * Nt)
     end
 
-    p_all = (lhs, rhs, extra, p_lhs, p_rhs, p_extra, u_reference_vals, reference_val_indices, Nref, Nx, t, Nt, p_iter)
+    p_all = (lhs, rhs, extra, p_lhs, p_rhs, p_extra, len_extra, u_reference_vals, reference_val_indices, Nref, Nx, t, Nt, p_iter)
     resid_prototype = zeros(eltype(u_iter0), Nref + Nx * (Nt - 1) + len_extra)
 
     function operator_loss!(du, u_vec, p)
-        lhs_inner, rhs_inner, extra_inner, p_lhs_inner, p_rhs_inner, p_extra_inner, u_reference_vals_inner, reference_val_indices_inner, Nref_inner, Nx_inner, t_inner, Nt_inner, iter_inner = p
+        lhs_inner, rhs_inner, extra_inner, p_lhs_inner, p_rhs_inner, p_extra_inner, len_extra_inner, u_reference_vals_inner, reference_val_indices_inner, Nref_inner, Nx_inner, t_inner, Nt_inner, iter_inner = p
         
         du[1:Nref_inner] .= zero(eltype(u_vec))
         l_exact = @view(du[1:Nref_inner])
@@ -55,7 +55,7 @@ function odil_gauss_newton(lhs, rhs, p_lhs, p_rhs, Nx, u_reference_vals, referen
 
         if extra_inner !== nothing && p_extra_inner !== nothing
             extra_inner(l_extra, u_vec, p_extra_inner, iter_inner[])
-            l_extra ./= sqrt(len_extra)
+            l_extra ./= sqrt(len_extra_inner)
         end
 
         return nothing
@@ -65,7 +65,7 @@ function odil_gauss_newton(lhs, rhs, p_lhs, p_rhs, Nx, u_reference_vals, referen
         if info_prints
             println("Computing Jacobian sparsity pattern...")
         end
-        jac_sparse = get_jac_sparsity(lhs, p_lhs, rhs, p_rhs, t, Nref, Nx, Nt, reference_val_indices, extra, p_extra, len_extra, u_iter0)
+        jac_sparse = get_jac_sparse(lhs, p_lhs, rhs, p_rhs, t, Nref, Nx, Nt, reference_val_indices, extra, p_extra, len_extra, u_iter0)
     end
 
     if colors === nothing
