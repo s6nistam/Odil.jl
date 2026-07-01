@@ -26,11 +26,10 @@ function odil_timestepping(problem::OdilProblem, odil_func, filename_prefix; t_c
 
         u_reference_vals = state.u[idx_chunk[:, t_chunk_size]]
         reference_val_indices = idx_chunk[:, 1]
+        u_iter0 = repeat(u_reference_vals, it_end - it_start + 1)
 
 
         if iter == Int(ceil((Nt - 1)/(t_chunk_size - 1)))
-            u_iter0 = repeat(u_reference_vals, it_end - it_start + 1)
-            
             if odil_func == odil_gauss_newton
                 
                 n_cols_final = length(u_iter0) 
