@@ -15,7 +15,7 @@ function odil_timestepping(problem::OdilProblem, odil_func, filename_prefix; t_c
 
     if odil_func == odil_gauss_newton
         println("Computing Jacobian sparsity pattern...")
-        jac_sparse = get_jac_sparse(problem.lhs, problem.p_lhs, problem.rhs, problem.p_rhs, problem.t, Nref, N_coords, t_chunk_size, problem.reference_val_indices, problem.extra, problem.p_extra, problem.len_extra, u_iter0)
+        jac_sparse = get_jac_sparse(problem.step, problem.p_step, problem.t[1 : t_chunk_size], Nref, N_coords, t_chunk_size, problem.reference_val_indices, problem.extra, problem.p_extra, problem.len_extra, u_iter0)
         println("Computing coloring for Jacobian sparsity pattern...")
         colors = matrix_colors(jac_sparse)
     end
@@ -42,7 +42,7 @@ function odil_timestepping(problem::OdilProblem, odil_func, filename_prefix; t_c
             end
         end
 
-        problem_chunk = OdilProblem(problem.lhs, problem.rhs, problem.p_lhs, problem.p_rhs, problem.N_coords, u_reference_vals, reference_val_indices, problem.t[it_start:it_end], problem.xyz...; problem.extra, problem.p_extra, problem.len_extra)
+        problem_chunk = OdilProblem(problem.step, problem.p_step, problem.N_coords, u_reference_vals, reference_val_indices, problem.t[it_start:it_end], problem.xyz...; problem.extra, problem.p_extra, problem.len_extra)
         println("Solving chunk $iter: time steps $it_start to $it_end")
         if odil_func == odil_gauss_newton
             res_chunk = odil_func(problem_chunk; u_iter0 = u_iter0, info_prints = false, jac_sparse = jac_sparse, colors = colors, kwargs...)
