@@ -1,6 +1,5 @@
 using Odil
 include("./trixi/tree_2d_dgsem/elixir_euler_blast_wave.jl")
-include("../src/aux/plot.jl")
 include("../src/semidiscretization/bdf.jl")
 
 polydeg = 2
