@@ -1,10 +1,10 @@
 using SciMLBase, Optim, OptimizationOptimJL, ADTypes, Enzyme, LinearAlgebra
 
-function odil_lbfgs(problem::OdilProblem; max_iterations = 100000, extra = problem.extra, p_extra = problem.p_extra, len_extra = problem.len_extra, u_iter0 = problem.u_iter0, autodiff = AutoEnzyme(), info_prints = true)
-    return odil_lbfgs(problem.step, problem.p_step, problem.N_coords, problem.u_reference_vals, problem.reference_val_indices, problem.t; max_iterations = max_iterations, extra = extra, p_extra = p_extra, len_extra = len_extra, u_iter0 = u_iter0, autodiff = autodiff, problem = problem, info_prints = info_prints)
+function odil_lbfgs(problem::OdilProblem; max_iterations = 100000, step_alloc_size = problem.step_alloc_size, extra = problem.extra, p_extra = problem.p_extra, len_extra = problem.len_extra, u_iter0 = problem.u_iter0, autodiff = AutoEnzyme(), info_prints = true)
+    return odil_lbfgs(problem.step, problem.p_step, problem.N_coords, problem.u_reference_vals, problem.reference_val_indices, problem.t; max_iterations = max_iterations, step_alloc_size = step_alloc_size, extra = extra, p_extra = p_extra, len_extra = len_extra, u_iter0 = u_iter0, autodiff = autodiff, problem = problem, info_prints = info_prints)
 end
 
-function odil_lbfgs(step, p_step, Nx, u_reference_vals, reference_val_indices, t; extra = nothing,  p_extra = nothing, len_extra = 0, u_iter0 = nothing, max_iterations = 100000, autodiff = AutoEnzyme(), problem = nothing, info_prints = true)
+function odil_lbfgs(step, p_step, Nx, u_reference_vals, reference_val_indices, t; max_iterations = 100000, step_alloc_size = 0, extra = nothing,  p_extra = nothing, len_extra = 0, u_iter0 = nothing, autodiff = AutoEnzyme(), problem = nothing, info_prints = true)
     Nref = length(u_reference_vals)
     Nt = length(t)
     num_unknowns = Nx * Nt
@@ -13,10 +13,10 @@ function odil_lbfgs(step, p_step, Nx, u_reference_vals, reference_val_indices, t
         u_iter0 = zeros(num_unknowns)
     end
 
-    p_all = (step, p_step, u_reference_vals, reference_val_indices, Nref, Nx, Nt, t, extra, p_extra, len_extra, iter)
+    p_all = (step, p_step, step_alloc_size, u_reference_vals, reference_val_indices, Nref, Nx, Nt, t, extra, p_extra, len_extra, iter)
 
     function loss(u_vec, p)
-        step_inner, p_step_inner, u_reference_vals_inner, reference_val_indices_inner, Nref_inner, Nx_inner, Nt_inner, t_inner, extra_inner, p_extra_inner, len_extra_inner, iter_inner = p
+        step_inner, p_step_inner, step_alloc_size_inner, u_reference_vals_inner, reference_val_indices_inner, Nref_inner, Nx_inner, Nt_inner, t_inner, extra_inner, p_extra_inner, len_extra_inner, iter_inner = p
         l = zero(eltype(u_vec))
         l_exact = zero(eltype(u_vec))
         l_pde = zero(eltype(u_vec))
@@ -28,11 +28,13 @@ function odil_lbfgs(step, p_step, Nx, u_reference_vals, reference_val_indices, t
         end
         
         u_step = zeros(eltype(u_vec), Nx_inner)
+        step_mem = zeros(eltype(u_vec), step_alloc_size_inner)
         for it in 2:Nt_inner
             fill!(u_step, zero(eltype(u_vec)))
+            fill!(step_mem, zero(eltype(u_vec)))
             u_it_last = @view(u_vec[(it - 2) * Nx_inner + 1:(it - 1) * Nx_inner])
             u_it = @view(u_vec[(it - 1) * Nx_inner + 1:it * Nx_inner])
-            step_inner(u_step, u_it_last, t_inner[it - 1], t_inner[it] - t_inner[it - 1], p_step_inner)
+            step_inner(step_mem, u_step, u_it_last, t_inner[it - 1], t_inner[it] - t_inner[it - 1], p_step_inner)
             l_pde += sum((u_step - u_it).^2)/(Nx_inner * Nt_inner)
         end
 

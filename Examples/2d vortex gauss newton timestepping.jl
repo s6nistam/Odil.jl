@@ -52,7 +52,7 @@ u_exact = reshape(u_matrix, sol_shape...)
 
 p_step = (ode.f, ode.p)
 
-problem = OdilProblem(step!, p_step, Nx, ode.u0, 1:length(ode.u0), t, x, y)
+problem = OdilProblem(step!, p_step, Nx, ode.u0, 1:length(ode.u0), t, x, y; step_alloc_size = 2 * Nx)
 # res = odil_gauss_newton(problem; max_iterations = 100, u_iter0 = repeat(ode.u0, Nt))
 res = odil_timestepping(problem, odil_gauss_newton, "odil_2d_vortex_gauss_newton"; t_chunk_size = 8, max_iterations = 20)
 # res = reconstruct_solution_from_chunks(problem, "odil_2d_vortex_gauss_newton"; t_chunk_size = 8)

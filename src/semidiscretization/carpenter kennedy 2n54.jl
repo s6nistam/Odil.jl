@@ -31,12 +31,14 @@ const ABc = [
 #     return u
 # end
 
-function step!(u_step, u, t, dt, p)
+function step!(step_mem, u_step, u, t, dt, p)
     f!, p_f = p
     u_step .= u
-    du = zeros(eltype(u), size(u))
+    du = @view(step_mem[1:length(u_step)])
+    du .= zero(eltype(u_step))
+    du_old = @view(step_mem[length(u_step) + 1 : 2 * length(u_step)])
     for i in 1:5
-        du_old = copy(du)
+        du_old .= du
         f!(du, u_step, p_f, t + ABc[10 + i] * dt)
         du .= ABc[i] .* du_old .+ dt .* du
         u_step .+= ABc[5 + i] .* du

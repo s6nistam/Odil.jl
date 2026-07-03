@@ -1,4 +1,4 @@
-function get_jac_sparse(step, p_step, t, Nref, Nx, Nt, reference_val_indices, extra, p_extra, len_extra, u_iter0)
+function get_jac_sparse(step, p_step, step_alloc_size, t, Nref, Nx, Nt, reference_val_indices, extra, p_extra, len_extra, u_iter0)
     I = Int[]
     J = Int[]
     for i in 1:Nref
@@ -9,6 +9,8 @@ function get_jac_sparse(step, p_step, t, Nref, Nx, Nt, reference_val_indices, ex
     noise = rand(eltype(u_iter0), Nx) .* 1e-8
     u_sparsity = u0 .+ noise
     u_step_out = zeros(eltype(u0), Nx)
+    step_mem = zeros(eltype(u0), step_alloc_size)
+    d_step_mem = zeros(eltype(u0), step_alloc_size)
     jac_step = zeros(eltype(u0), Nx, Nx)
     
     for i in 1:Nx
@@ -19,6 +21,7 @@ function get_jac_sparse(step, p_step, t, Nref, Nx, Nt, reference_val_indices, ex
         Enzyme.autodiff(
             Enzyme.Forward, 
             Enzyme.Const(step), 
+            Enzyme.Duplicated(step_mem, d_step_mem), 
             Enzyme.Duplicated(u_step_out, d_u_step), 
             Enzyme.Duplicated(u_sparsity, d_u), 
             Enzyme.Const(t[1]), 
