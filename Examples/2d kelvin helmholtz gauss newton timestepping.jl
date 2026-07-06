@@ -3,7 +3,7 @@ include("./trixi/tree_2d_dgsem/elixir_euler_kelvin_helmholtz_instability_adaptiv
 include("../src/semidiscretization/carpenter kennedy 2n54.jl")
 
 polydeg = 3
-refinement_level = 4
+refinement_level = 5
 ndims = 2
 variables = Int64(length(ode.u0)/((polydeg + 1)^ndims * (2^refinement_level)^ndims))
 
