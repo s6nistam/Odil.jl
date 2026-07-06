@@ -1,7 +1,21 @@
 using GLMakie
 using ColorSchemes
 
-function plot_1d_time_comparison(x, t, u_exact, u_approx;)
+const plot_screens = Dict{Int, GLMakie.Screen}()
+
+function show_figure(fig; variable = nothing)
+    if variable === nothing
+        display(fig)
+    else
+        screen = get!(plot_screens, variable) do
+            GLMakie.Screen()
+        end
+        display(screen, fig)
+    end
+    return fig
+end
+
+function plot_1d_time_comparison(x, t, u_exact, u_approx; variable = nothing)
 
     z_min = min(minimum(u_exact), minimum(u_approx))
     z_max = max(maximum(u_exact), maximum(u_approx))
@@ -16,12 +30,12 @@ function plot_1d_time_comparison(x, t, u_exact, u_approx;)
 
     Colorbar(fig[1, 3], hm1, label = "Value")
 
-    display(fig)
+    show_figure(fig; variable = variable)
 
     return fig
 end
 
-function plot_1d_time(x, t, u;)
+function plot_1d_time(x, t, u; variable = nothing)
 
     z_min = minimum(u)
     z_max = maximum(u)
@@ -33,12 +47,12 @@ function plot_1d_time(x, t, u;)
 
     Colorbar(fig[1, 2], hm, label = "Value")
 
-    display(fig)
+    show_figure(fig; variable = variable)
 
     return fig
 end
 
-function plot_fe_1d_time(x, e, u;
+function plot_fe_1d_time(x, e, u; variable = nothing,
     c_min = nothing, c_max = nothing)
 
     fig = Figure(size = (400, 400))
@@ -77,13 +91,13 @@ function plot_fe_1d_time(x, e, u;
         it[] = val
     end
 
-    display(fig)
+    show_figure(fig; variable = variable)
 
     return fig
 end
 
 function plot_fe_1d_time_compare(x, e, u_exact, u_approx;
-    c_min = nothing, c_max = nothing)
+    c_min = nothing, c_max = nothing, variable = nothing)
 
     fig = Figure(size = (800, 400))
     it = Observable(1)
@@ -134,13 +148,13 @@ function plot_fe_1d_time_compare(x, e, u_exact, u_approx;
         it[] = val
     end
 
-    display(fig)
+    show_figure(fig; variable = variable)
 
     return fig
 end
 
 function plot_fe_2d_time(x, y, e, u;
-    c_min = nothing, c_max = nothing)
+    c_min = nothing, c_max = nothing, variable = nothing)
 
     fig = Figure(size = (400, 400))
     it = Observable(1)
@@ -179,13 +193,13 @@ function plot_fe_2d_time(x, y, e, u;
         it[] = val
     end
 
-    display(fig)
+    show_figure(fig; variable = variable)
 
     return fig
 end
 
 function plot_fe_2d_time_compare(x, y, e, u_exact, u_approx;
-    c_min = nothing, c_max = nothing)
+    c_min = nothing, c_max = nothing, variable = nothing)
 
     fig = Figure(size = (800, 400))
     it = Observable(1)
@@ -237,7 +251,7 @@ function plot_fe_2d_time_compare(x, y, e, u_exact, u_approx;
         it[] = val
     end
 
-    display(fig)
+    show_figure(fig; variable = variable)
 
     return fig
 end
@@ -291,7 +305,7 @@ function interpolate_to_equidistant(x, y, z, u)
 end
 
 function plot_fe_3d_time(x, y, z, e, u;
-    c_min = nothing, c_max = nothing)
+    c_min = nothing, c_max = nothing, variable = nothing)
 
     fig = Figure(size = (400, 400))
     it = Observable(1)
@@ -340,13 +354,13 @@ function plot_fe_3d_time(x, y, z, e, u;
         it[] = val
     end
 
-    display(fig)
+    show_figure(fig; variable = variable)
 
     return fig
 end
 
 function plot_fe_3d_time_compare(x, y, z, e, u_exact, u_approx;
-    c_min = nothing, c_max = nothing)
+    c_min = nothing, c_max = nothing, variable = nothing)
 
     fig = Figure(size = (800, 400))
     it = Observable(1)
@@ -415,7 +429,7 @@ function plot_fe_3d_time_compare(x, y, z, e, u_exact, u_approx;
         it[] = val
     end
 
-    display(fig)
+    show_figure(fig; variable = variable)
 
     return fig
 end
@@ -426,7 +440,7 @@ function plot(problem::OdilProblem{1}, u_state; c_min = nothing, c_max = nothing
     variables = Int(problem.N_coords/length(x))
     u_approx = reshape(u_state, (variables, size(x, 1), length(x[1, :]), length(problem.t)))
     for i in 1:variables
-        plot_fe_1d_time(x, e, u_approx[i, :, :, :]; c_min = c_min, c_max = c_max)
+        plot_fe_1d_time(x, e, u_approx[i, :, :, :]; c_min = c_min, c_max = c_max, variable = i)
     end
 end
 
@@ -436,7 +450,7 @@ function plot(problem::OdilProblem{1}, u_state, u_exact; c_min = nothing, c_max 
     variables = Int(problem.N_coords/length(x))
     u_approx = reshape(u_state, (variables, size(x, 1), length(x[1, :]), length(problem.t)))
     for i in 1:variables
-        plot_fe_1d_time_compare(x, e, u_exact, u_approx[i, :, :, :]; c_min = c_min, c_max = c_max)
+        plot_fe_1d_time_compare(x, e, u_exact, u_approx[i, :, :, :]; c_min = c_min, c_max = c_max, variable = i)
     end
 end
 
@@ -446,7 +460,7 @@ function plot(problem::OdilProblem{2}, u_state; c_min = nothing, c_max = nothing
     variables = Int(problem.N_coords/length(x))
     u_approx = reshape(u_state, (variables, size(x, 1), size(y, 2), length(x[1, 1, :]), length(problem.t)))
     for i in 1:variables
-        plot_fe_2d_time(x, y, e, u_approx[i, :, :, :, :]; c_min = c_min, c_max = c_max)
+        plot_fe_2d_time(x, y, e, u_approx[i, :, :, :, :]; c_min = c_min, c_max = c_max, variable = i)
     end
 end
 
@@ -456,7 +470,7 @@ function plot(problem::OdilProblem{2}, u_state, u_exact; c_min = nothing, c_max 
     variables = Int(problem.N_coords/length(x))
     u_approx = reshape(u_state, (variables, size(x, 1), size(y, 2), length(x[1, 1, :]), length(problem.t)))
     for i in 1:variables
-        plot_fe_2d_time_compare(x, y, e, u_exact, u_approx[i, :, :, :, :]; c_min = c_min, c_max = c_max)
+        plot_fe_2d_time_compare(x, y, e, u_exact, u_approx[i, :, :, :, :]; c_min = c_min, c_max = c_max, variable = i)
     end
 end
 
@@ -466,7 +480,7 @@ function plot(problem::OdilProblem{3}, u_state; c_min = nothing, c_max = nothing
     variables = Int(problem.N_coords/length(x))
     u_approx = reshape(u_state, (variables, size(x, 1), size(y, 2), size(z, 3), length(x[1, 1, 1, :]), length(problem.t)))
     for i in 1:variables
-        plot_fe_3d_time(x, y, z, e, u_approx[i, :, :, :, :, :]; c_min = c_min, c_max = c_max)
+        plot_fe_3d_time(x, y, z, e, u_approx[i, :, :, :, :, :]; c_min = c_min, c_max = c_max, variable = i)
     end
 end
 
@@ -476,6 +490,6 @@ function plot(problem::OdilProblem{3}, u_state, u_exact; c_min = nothing, c_max 
     variables = Int(problem.N_coords/length(x))
     u_approx = reshape(u_state, (variables, size(x, 1), size(y, 2), size(z, 3), length(x[1, 1, 1, :]), length(problem.t)))
     for i in 1:variables
-        plot_fe_3d_time_compare(x, y, z, e, u_exact, u_approx[i, :, :, :, :, :]; c_min = c_min, c_max = c_max)
+        plot_fe_3d_time_compare(x, y, z, e, u_exact, u_approx[i, :, :, :, :, :]; c_min = c_min, c_max = c_max, variable = i)
     end
 end
