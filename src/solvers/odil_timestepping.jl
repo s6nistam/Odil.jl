@@ -17,7 +17,7 @@ function odil_timestepping(problem::OdilProblem, odil_func, filename_prefix; t_c
         println("Computing Jacobian sparsity pattern...")
         jac_sparse = get_jac_sparse(problem.timestep, problem.p_timestep, problem.timestep_alloc_size, problem.t[1 : t_chunk_size], Nref, N_coords, t_chunk_size, problem.reference_val_indices, problem.extra, problem.p_extra, problem.len_extra, u_iter0)
         println("Computing coloring for Jacobian sparsity pattern...")
-        colors = matrix_colors(jac_sparse)
+        colors = fast_coloring(jac_sparse, ColoringProblem(), GreedyColoringAlgorithm())
     end
 
     for iter in 1:Int(ceil((Nt - 1)/(t_chunk_size - 1)))

@@ -1,4 +1,4 @@
-using SciMLBase, NonlinearSolveFirstOrder, ADTypes, Enzyme, LinearAlgebra, Symbolics, SparseDiffTools, SparseArrays, SparseMatrixColorings
+using SciMLBase, NonlinearSolveFirstOrder, ADTypes, Enzyme, LinearAlgebra, Symbolics, SparseArrays, SparseMatrixColorings
 
 function odil_gauss_newton(problem::OdilProblem; max_iterations = 2, timestep_alloc_size = problem.timestep_alloc_size, extra = problem.extra, p_extra = problem.p_extra, len_extra = problem.len_extra, u_iter0 = problem.u_iter0, autodiff = AutoEnzyme(), info_prints = true, jac_sparse = nothing, colors = nothing)
     return odil_gauss_newton(problem.timestep, problem.p_timestep, problem.N_coords, problem.u_reference_vals, problem.reference_val_indices, problem.t; max_iterations = max_iterations, timestep_alloc_size = timestep_alloc_size, extra = extra, p_extra = p_extra, len_extra = len_extra, u_iter0 = u_iter0, autodiff = autodiff, problem = problem, info_prints = info_prints, jac_sparse = jac_sparse, colors = colors)
@@ -59,7 +59,7 @@ function odil_gauss_newton(timestep, p_timestep, Nx, u_reference_vals, reference
     end
 
     if colors === nothing
-        colors = matrix_colors(jac_sparse)
+        colors = fast_coloring(jac_sparse, ColoringProblem(), GreedyColoringAlgorithm())
     end
     
     optf = NonlinearFunction(operator_loss!, resid_prototype = resid_prototype, jac_prototype = jac_sparse, colorvec = colors)
