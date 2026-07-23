@@ -1,6 +1,5 @@
 using Odil
 include("./tree dgsem advection.jl")
-include("../src/semidiscretization/carpenter kennedy 2n54.jl")
 
 polydeg = 2
 refinement_level = 4
@@ -22,9 +21,11 @@ u_matrix = reduce(hcat, vec.(sol.u))
 u_exact = reshape(u_matrix, sol_shape...)
 # plot_fe_3d_time(x, y, z, e, u_exact)
 # plot_fe_3d_time_compare(x, y, z, e, u_exact, u_exact)
-p_step = (ode.f, ode.p)
 
-problem = OdilProblem(step!, p_step, Nx, ode.u0, 1:length(ode.u0), t, x; step_alloc_size = 2 * Nx)
+timestep! = get_timestep(Odil.CarpenterKennedy2N54())
+p_timestep = (ode.f, ode.p)
+
+problem = OdilProblem(timestep!, p_timestep, Nx, ode.u0, 1:length(ode.u0), t, x; timestep_alloc_size = 2 * Nx)
 res = odil_gauss_newton(problem; max_iterations = 1000)
 
 u_approx = reshape(res, sol_shape...)

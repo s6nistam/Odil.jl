@@ -1,6 +1,6 @@
 using Odil
-include("../../src/semidiscretization/wave.jl")
-include("../../src/references/wave.jl")
+include("./discretization.jl")
+include("./reference.jl")
 
 Nx = 32
 Nt = 32

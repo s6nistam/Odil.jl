@@ -1,6 +1,5 @@
 using Odil
 include("./structured dgsem advection.jl")
-include("../src/semidiscretization/carpenter kennedy 2n54.jl")
 
 polydeg = 2
 refinement_level = 4
@@ -21,9 +20,11 @@ sol_shape = (variables, (polydeg + 1 for _ in 1:ndims)..., (2^refinement_level)^
 u_matrix = reduce(hcat, vec.(sol.u))
 u_exact = reshape(u_matrix, sol_shape...)
 
-p_step = (ode.f, ode.p)
 
-problem = OdilProblem(step!, p_step, Nx, ode.u0, 1:length(ode.u0), t, x; step_alloc_size = 2 * Nx)
+timestep! = get_timestep(Odil.CarpenterKennedy2N54())
+p_timestep = (ode.f, ode.p)
+
+problem = OdilProblem(timestep!, p_timestep, Nx, ode.u0, 1:length(ode.u0), t, x; timestep_alloc_size = 2 * Nx)
 # res = odil_gauss_newton(problem; max_iterations = 200)
 res = odil_timestepping(problem, odil_gauss_newton, "odil_1d_advection_structured_gauss_newton"; t_chunk_size = 10, max_iterations = 200)
 

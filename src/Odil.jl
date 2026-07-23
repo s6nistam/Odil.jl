@@ -6,6 +6,7 @@ include("solvers/odil.jl")
 include("solvers/odil_gauss_newton.jl")
 include("solvers/odil_lbfgs.jl")
 include("solvers/odil_timestepping.jl")
+include("time integration/time integration.jl")
 include("aux/h5.jl")
 include("aux/plot.jl")
 include("aux/sparsity.jl")
@@ -16,6 +17,7 @@ export odil_gauss_newton, odil_lbfgs
 export odil_timestepping
 export reconstruct_solution_from_chunks
 export AutoEnzyme, AutoFiniteDiff
+export get_timestep
 export plot
 export plot_1d_time_comparison
 export plot_1d_time

@@ -1,6 +1,5 @@
 using Odil
 include("./dgsem euler vortex.jl")
-include("../src/semidiscretization/carpenter kennedy 2n54.jl")
 
 polydeg = 3
 refinement_level = 4
@@ -24,9 +23,11 @@ u_matrix = reduce(hcat, vec.(sol.u))
 u_exact = reshape(u_matrix, sol_shape...)
 # plot_fe_3d_time(x, y, z, e, u_exact)
 # plot_fe_3d_time_compare(x, y, z, e, u_exact, u_exact)
-p_step = (ode.f, ode.p)
 
-problem = OdilProblem(step!, p_step, Nx, ode.u0, 1:length(ode.u0), t, x, y; step_alloc_size = 2 * Nx)
+timestep! = get_timestep(Odil.CarpenterKennedy2N54())
+p_timestep = (ode.f, ode.p)
+
+problem = OdilProblem(timestep!, p_timestep, Nx, ode.u0, 1:length(ode.u0), t, x, y; timestep_alloc_size = 2 * Nx)
 # res = odil_gauss_newton(problem; max_iterations = 100, u_iter0 = repeat(ode.u0, Nt))
 res = odil_timestepping(problem, odil_gauss_newton, "odil_2d_vortex_gauss_newton"; t_chunk_size = 8, max_iterations = 20)
 # res = reconstruct_solution_from_chunks(problem, "odil_2d_vortex_gauss_newton"; t_chunk_size = 8)
