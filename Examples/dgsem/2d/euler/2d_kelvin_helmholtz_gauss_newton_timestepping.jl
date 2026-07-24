@@ -1,5 +1,5 @@
 using Odil
-include("./dgsem euler kelvin helmholtz.jl")
+include("./dgsem_euler_kelvin_helmholtz.jl")
 
 polydeg = 3
 refinement_level = 5

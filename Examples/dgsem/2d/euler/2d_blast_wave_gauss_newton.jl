@@ -1,5 +1,5 @@
 using Odil
-include("./dgsem euler blast wave.jl")
+include("./dgsem_euler_blast_wave.jl")
 
 polydeg = 3
 refinement_level = 4

@@ -1,5 +1,5 @@
 using Odil
-include("./structured dgsem advection.jl")
+include("./structured_dgsem_advection.jl")
 
 polydeg = 2
 refinement_level = 4

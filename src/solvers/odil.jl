@@ -1,5 +1,3 @@
-using ADTypes
-
 struct OdilProblem{N, XYZ<:Tuple, FS, PS, T, TT, II, FE, PE}
     timestep::FS
     p_timestep::PS

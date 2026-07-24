@@ -1,5 +1,5 @@
 using Odil
-include("./dgsem euler vortex.jl")
+include("./dgsem_euler_vortex.jl")
 
 polydeg = 1
 refinement_level = 3
