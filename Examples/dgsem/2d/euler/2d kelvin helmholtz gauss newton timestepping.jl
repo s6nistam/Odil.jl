@@ -14,15 +14,11 @@ Nx = variables * length(x)
 t = sol.t
 Nt = length(t)
 dt = [t[i + 1] - t[i] for i in 1:Nt-1]
-p_lhs = (Nx, t, Nt, dt)
 
 e = 1:(2^refinement_level)^ndims
 sol_shape = (variables, (polydeg + 1 for _ in 1:ndims)..., (2^refinement_level)^ndims, Nt)
 
-u_matrix = reduce(hcat, vec.(sol.u))
-u_exact = reshape(u_matrix, sol_shape...)
-# plot_fe_3d_time(x, y, z, e, u_exact)
-# plot_fe_3d_time_compare(x, y, z, e, u_exact, u_exact)
+u_exact = reduce(hcat, vec.(sol.u))
 
 timestep! = get_timestep(Odil.CarpenterKennedy2N54())
 p_timestep = (ode.f, ode.p)
@@ -33,7 +29,4 @@ res = odil_timestepping(problem, odil_gauss_newton, "odil_2d_kelvin_helmholtz_ga
 # res = reconstruct_solution_from_chunks(problem, "odil_2d_kelvin_helmholtz_gauss_newton"; t_chunk_size = 8)
 write_vtk(problem, res, "odil_2d_kelvin_helmholtz_gauss_newton")
 
-u_approx = reshape(res, sol_shape...)
-for var in 1:variables
-    plot_fe_2d_time_compare(x, y, e, u_exact[var, :, :, :, :], u_approx[var, :, :, :, :])
-end
+plot(problem, u_exact, res)
