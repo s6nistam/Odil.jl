@@ -2,7 +2,7 @@
 
 julia_version = "1.12.6"
 manifest_format = "2.0"
-project_hash = "92767b876d5dec467d11bcc17f3405bac789d414"
+project_hash = "64d5e7e37293a1ce6706c7a069f76ff29b846815"
 
 [[deps.ADTypes]]
 git-tree-sha1 = "ec6be48a85c93d995563b84bff8a86bc98df45ce"
@@ -1577,7 +1577,7 @@ uuid = "510215fc-4207-5dde-b226-833fc4488ee2"
 version = "0.5.5"
 
 [[deps.Odil]]
-deps = ["ADTypes", "ColorSchemes", "Enzyme", "FiniteDifferences", "ForwardDiff", "GLMakie", "HDF5", "LinearAlgebra", "Morton", "NLSolversBase", "NonlinearSolveFirstOrder", "Optim", "OptimizationOptimJL", "ReadVTK", "SciMLBase", "SparseArrays", "SparseConnectivityTracer", "SparseMatrixColorings", "Symbolics", "WriteVTK"]
+deps = ["ADTypes", "ColorSchemes", "Enzyme", "FiniteDifferences", "ForwardDiff", "GLMakie", "HDF5", "LinearAlgebra", "Morton", "NLSolversBase", "NonlinearSolveFirstOrder", "Optim", "ReadVTK", "SciMLBase", "SparseArrays", "SparseConnectivityTracer", "SparseMatrixColorings", "Symbolics", "WriteVTK"]
 path = "."
 uuid = "c15e9705-4550-4157-9636-e6a06c04b4f1"
 version = "0.1.0-DEV"
@@ -1653,42 +1653,6 @@ version = "2.2.1"
 
     [deps.Optim.weakdeps]
     MathOptInterface = "b8f27783-ece8-5eb3-8dc8-9495eed66fee"
-
-[[deps.OptimizationBase]]
-deps = ["ADTypes", "ArrayInterface", "DifferentiationInterface", "DocStringExtensions", "FastClosures", "LinearAlgebra", "PrecompileTools", "Reexport", "SciMLBase", "SciMLLogging", "SparseArrays", "SparseConnectivityTracer", "SparseMatrixColorings", "SymbolicIndexingInterface"]
-git-tree-sha1 = "6e0bf969e0f51bc5778dc33793be061aa6be3dac"
-uuid = "bca83a33-5cc9-4baa-983d-23429ab6bcbb"
-version = "5.2.2"
-
-    [deps.OptimizationBase.extensions]
-    OptimizationChainRulesCoreExt = "ChainRulesCore"
-    OptimizationEnzymeExt = ["ChainRulesCore", "Enzyme"]
-    OptimizationFiniteDiffExt = "FiniteDiff"
-    OptimizationForwardDiffExt = "ForwardDiff"
-    OptimizationMLDataDevicesExt = "MLDataDevices"
-    OptimizationMLUtilsExt = "MLUtils"
-    OptimizationMooncakeExt = "Mooncake"
-    OptimizationReverseDiffExt = "ReverseDiff"
-    OptimizationSymbolicAnalysisExt = "SymbolicAnalysis"
-    OptimizationZygoteExt = "Zygote"
-
-    [deps.OptimizationBase.weakdeps]
-    ChainRulesCore = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
-    Enzyme = "7da242da-08ed-463a-9acd-ee780be4f1d9"
-    FiniteDiff = "6a86dc24-6348-571c-b903-95158fe2bd41"
-    ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"
-    MLDataDevices = "7e8f7934-dd98-4c1a-8fe8-92b47a384d40"
-    MLUtils = "f1d291b0-491e-4a28-83b9-f70985020b54"
-    Mooncake = "da2b9cff-9c12-43a0-ae48-6db2b0edb7d6"
-    ReverseDiff = "37e2e3b7-166d-5795-8a7a-e32c996b4267"
-    SymbolicAnalysis = "4297ee4d-0239-47d8-ba5d-195ecdf594fe"
-    Zygote = "e88e6eb3-aa80-5325-afca-941959d7151f"
-
-[[deps.OptimizationOptimJL]]
-deps = ["Optim", "OptimizationBase", "Reexport", "SciMLBase", "SparseArrays"]
-git-tree-sha1 = "2ff86400fbc94d3012f1f9b66326161935b1de2d"
-uuid = "36348300-93cb-4f02-beb5-3c3902f8871e"
-version = "0.4.16"
 
 [[deps.Opus_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]

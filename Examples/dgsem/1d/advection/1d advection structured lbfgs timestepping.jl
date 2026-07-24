@@ -23,6 +23,6 @@ timestep! = get_timestep(Odil.CarpenterKennedy2N54())
 p_timestep = (ode.f, ode.p)
 
 problem = OdilProblem(timestep!, p_timestep, Nx, ode.u0, 1:length(ode.u0), t, x; timestep_alloc_size = 2 * Nx)
-res = odil_lbfgs(problem; max_iterations = 200)
+res = odil_timestepping(problem, odil_lbfgs, "odil_1d_advection_structured_lbfgs"; t_chunk_size = 10, max_iterations = 200)
 
 plot(problem, u_exact, res)

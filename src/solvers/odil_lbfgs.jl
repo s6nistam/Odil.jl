@@ -1,10 +1,10 @@
-using SciMLBase, Optim, OptimizationOptimJL, ADTypes, Enzyme, LinearAlgebra
+using SciMLBase, Optim, ADTypes, Enzyme, LinearAlgebra
 
-function odil_lbfgs(problem::OdilProblem; max_iterations = 100000, timestep_alloc_size = problem.timestep_alloc_size, extra = problem.extra, p_extra = problem.p_extra, len_extra = problem.len_extra, u_iter0 = problem.u_iter0, autodiff = AutoEnzyme(), info_prints = true)
-    return odil_lbfgs(problem.timestep, problem.p_timestep, problem.N_coords, problem.u_reference_vals, problem.reference_val_indices, problem.t; max_iterations = max_iterations, timestep_alloc_size = timestep_alloc_size, extra = extra, p_extra = p_extra, len_extra = len_extra, u_iter0 = u_iter0, autodiff = autodiff, problem = problem, info_prints = info_prints)
+function odil_lbfgs(problem::OdilProblem; max_iterations = 100000, timestep_alloc_size = problem.timestep_alloc_size, extra = problem.extra, p_extra = problem.p_extra, len_extra = problem.len_extra, u_iter0 = problem.u_iter0, info_prints = true)
+    return odil_lbfgs(problem.timestep, problem.p_timestep, problem.N_coords, problem.u_reference_vals, problem.reference_val_indices, problem.t; max_iterations = max_iterations, timestep_alloc_size = timestep_alloc_size, extra = extra, p_extra = p_extra, len_extra = len_extra, u_iter0 = u_iter0, problem = problem, info_prints = info_prints)
 end
 
-function odil_lbfgs(timestep, p_timestep, Nx, u_reference_vals, reference_val_indices, t; max_iterations = 100000, timestep_alloc_size = 0, extra = nothing,  p_extra = nothing, len_extra = 0, u_iter0 = nothing, autodiff = AutoEnzyme(), problem = nothing, info_prints = true)
+function odil_lbfgs(timestep, p_timestep, Nx, u_reference_vals, reference_val_indices, t; max_iterations = 100000, timestep_alloc_size = 0, extra = nothing,  p_extra = nothing, len_extra = 0, u_iter0 = nothing, problem = nothing, info_prints = true)
     Nref = length(u_reference_vals)
     Nt = length(t)
     num_unknowns = Nx * Nt
@@ -50,17 +50,18 @@ function odil_lbfgs(timestep, p_timestep, Nx, u_reference_vals, reference_val_in
         return l
     end
     
-    optf = OptimizationFunction(loss, autodiff)
-    prob = OptimizationProblem(optf, u_iter0, p_all) 
-    opt = LBFGS(m = 50)
-    # opt = LBFGS()
+    # optf = OptimizationFunction(loss, autodiff, grad = true, hess = false)
+    # prob = OptimizationProblem(optf, u_iter0, p_all) 
+    # opt = LBFGS(m = 50)
+    opt = LBFGS()
+    optf = Enzyme.Const((u_vec) -> loss(u_vec, p_all))
 
-    callback = function (state, l)
-        iter[] = state.iter
-        if state.iter % 10 == 0 || state.iter == 1
-            println("Iteration ", state.iter, ": Loss = ", l, " Loss gradient = ", norm(state.grad))
+    callback = function (state)
+        iter[] += 1
+        if iter[] % 10 == 0 || iter[] == 1
+            println("Iteration ", iter[], ": Loss = ", state.f_x, " Loss gradient = ", norm(state.g_x))
 
-            # plot(problem, state.u)
+            plot(problem, state.x)
         end
         return false
     end
@@ -68,11 +69,12 @@ function odil_lbfgs(timestep, p_timestep, Nx, u_reference_vals, reference_val_in
     if info_prints
         println("Starte Lösung...")
     end
-    res = solve(prob, opt, maxiters = max_iterations, callback = callback)
+    # res = solve(prob, opt, maxiters = max_iterations, callback = callback)
+    res = optimize(optf, u_iter0, opt, Optim.Options(iterations = max_iterations, callback = callback); autodiff = AutoEnzyme())
     
     if info_prints
         println("Optimierung beendet!")
-        println("Return Code: ", res.retcode)
+        println("Return Code: ", res.termination_code)
     end
-    return res.u
+    return res.minimizer
 end
