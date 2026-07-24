@@ -444,13 +444,14 @@ function plot(problem::OdilProblem{1}, u_state; c_min = nothing, c_max = nothing
     end
 end
 
-function plot(problem::OdilProblem{1}, u_state, u_exact; c_min = nothing, c_max = nothing)
+function plot(problem::OdilProblem{1}, u_exact, u_state; c_min = nothing, c_max = nothing)
     (x,) = problem.xyz
     e = 1:length(x[1, :])
     variables = Int(problem.N_coords/length(x))
     u_approx = reshape(u_state, (variables, size(x, 1), length(x[1, :]), length(problem.t)))
+    u_exact = reshape(u_exact, (variables, size(x, 1), length(x[1, :]), length(problem.t)))
     for i in 1:variables
-        plot_fe_1d_time_compare(x, e, u_exact, u_approx[i, :, :, :]; c_min = c_min, c_max = c_max, variable = i)
+        plot_fe_1d_time_compare(x, e, u_exact[i, :, :, :], u_approx[i, :, :, :]; c_min = c_min, c_max = c_max, variable = i)
     end
 end
 
@@ -464,13 +465,14 @@ function plot(problem::OdilProblem{2}, u_state; c_min = nothing, c_max = nothing
     end
 end
 
-function plot(problem::OdilProblem{2}, u_state, u_exact; c_min = nothing, c_max = nothing)
+function plot(problem::OdilProblem{2}, u_exact, u_state; c_min = nothing, c_max = nothing)
     x, y = problem.xyz
     e = 1:length(x[1, 1, :])
     variables = Int(problem.N_coords/length(x))
     u_approx = reshape(u_state, (variables, size(x, 1), size(y, 2), length(x[1, 1, :]), length(problem.t)))
+    u_exact = reshape(u_exact, (variables, size(x, 1), size(y, 2), length(x[1, 1, :]), length(problem.t)))
     for i in 1:variables
-        plot_fe_2d_time_compare(x, y, e, u_exact, u_approx[i, :, :, :, :]; c_min = c_min, c_max = c_max, variable = i)
+        plot_fe_2d_time_compare(x, y, e, u_exact[i, :, :, :, :], u_approx[i, :, :, :, :]; c_min = c_min, c_max = c_max, variable = i)
     end
 end
 
@@ -484,12 +486,13 @@ function plot(problem::OdilProblem{3}, u_state; c_min = nothing, c_max = nothing
     end
 end
 
-function plot(problem::OdilProblem{3}, u_state, u_exact; c_min = nothing, c_max = nothing)
+function plot(problem::OdilProblem{3}, u_exact, u_state; c_min = nothing, c_max = nothing)
     x, y, z = problem.xyz
     e = 1:length(x[1, 1, 1, :])
     variables = Int(problem.N_coords/length(x))
     u_approx = reshape(u_state, (variables, size(x, 1), size(y, 2), size(z, 3), length(x[1, 1, 1, :]), length(problem.t)))
+    u_exact = reshape(u_exact, (variables, size(x, 1), size(y, 2), size(z, 3), length(x[1, 1, 1, :]), length(problem.t)))
     for i in 1:variables
-        plot_fe_3d_time_compare(x, y, z, e, u_exact, u_approx[i, :, :, :, :, :]; c_min = c_min, c_max = c_max, variable = i)
+        plot_fe_3d_time_compare(x, y, z, e, u_exact[i, :, :, :, :, :], u_approx[i, :, :, :, :, :]; c_min = c_min, c_max = c_max, variable = i)
     end
 end
