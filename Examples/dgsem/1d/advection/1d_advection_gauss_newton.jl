@@ -1,5 +1,5 @@
 using Odil
-include("./tree_dgsem_advection.jl")
+include("./dgsem_advection.jl")
 
 polydeg = 2
 refinement_level = 4
@@ -20,6 +20,8 @@ timestep! = get_timestep(Odil.CarpenterKennedy2N54())
 p_timestep = (ode.f, ode.p)
 
 problem = OdilProblem(timestep!, p_timestep, Nx, ode.u0, 1:length(ode.u0), t, x; timestep_alloc_size = 2 * Nx)
-res = odil_gauss_newton(problem; max_iterations = 1000)
+res = odil_gauss_newton(problem; max_iterations = 200)
 
 plot(problem, u_exact, res)
+
+write_vtk(problem, res, "odil_1d_advection_gauss_newton")
