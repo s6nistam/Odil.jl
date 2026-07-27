@@ -1,11 +1,16 @@
-function lhs!(du, u, p, it)
-    Nx, t, Nt, dt = p 
-    fill!(du, 0.0)
-    idx = LinearIndices((Nx, Nt))
+struct ExplicitEuler
+end
 
-    for ix in 1:Nx
-        du[ix] = (u[idx[ix, it]] - u[idx[ix, it - 1]]) / dt[it - 1]
-    end
-    
+function timestep_explicit_euler!(timestep_mem, u_timestep, u, t, dt, p)
+    f!, p_f = p
+    u_timestep .= u
+    du = @view(timestep_mem[1:length(u_timestep)])
+    du .= zero(eltype(u_timestep))
+    f!(du, u_timestep, p_f, t)
+    u_timestep .+= dt .* du
     return nothing
+end
+
+function get_timestep(method::ExplicitEuler)
+    return timestep_explicit_euler!
 end

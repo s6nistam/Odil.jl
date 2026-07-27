@@ -52,7 +52,7 @@ const ABc = [
 #     return u
 # end
 
-function timestep!(timestep_mem, u_timestep, u, t, dt, p)
+function timestep_carpenter_kennedy_2n54!(timestep_mem, u_timestep, u, t, dt, p)
     f!, p_f = p
     u_timestep .= u
     du = @view(timestep_mem[1:length(u_timestep)])
@@ -68,5 +68,5 @@ function timestep!(timestep_mem, u_timestep, u, t, dt, p)
 end
 
 function get_timestep(method::CarpenterKennedy2N54)
-    return timestep!
+    return timestep_carpenter_kennedy_2n54!
 end

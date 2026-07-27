@@ -18,9 +18,11 @@ dt = [t[i + 1] - t[i] for i in 1:Nt-1]
 u_exact = reduce(hcat, vec.(sol.u))
 
 timestep! = get_timestep(Odil.CarpenterKennedy2N54())
+# timestep! = get_timestep(Odil.ExplicitEuler())
 p_timestep = (ode.f, ode.p)
 
 problem = OdilProblem(timestep!, p_timestep, Nx, ode.u0, 1:length(ode.u0), t, x, y; timestep_alloc_size = 2 * Nx)
+# problem = OdilProblem(timestep!, p_timestep, Nx, ode.u0, 1:length(ode.u0), t, x, y; timestep_alloc_size = Nx)
 res = odil_gauss_newton(problem; max_iterations = 20, u_iter0 = vec(repeat(ode.u0, Nt)))
 
 plot(problem, u_exact, res)
