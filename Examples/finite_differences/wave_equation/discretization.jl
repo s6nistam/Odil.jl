@@ -1,33 +1,35 @@
-function rhs!(du, u, p, t_val)
-    x, Nx, dx, t, Nt, dt = p 
+function f!(du, u, p, t_val)
+    x, Nx, dx = p 
     fill!(du, 0.0)
     idx = LinearIndices((Nx, 2))
     
     du[idx[:, 1]] .= u[idx[:, 2]]
+    
     for ix in 2:(Nx - 1)
-        du[idx[ix, 2]] = (u[idx[ix - 1, 1]] - 2 * u[idx[ix, 1]] + u[idx[ix + 1, 1]]) / (dx[ix]^2)
+        du[idx[ix, 2]] = (u[idx[ix - 1, 1]] - 2 * u[idx[ix, 1]] + u[idx[ix + 1, 1]]) / (dx^2)
     end
 
-    u_l = (u[idx[2, 1]] - 6*u[idx[1, 1]] + 8*get_exact_wave(x[1] - dx[1], t_val))/3
-    u_r = (u[idx[Nx - 1, 1]] - 6 * u[idx[Nx, 1]] + 8 * get_exact_wave(x[Nx] + dx[Nx - 1], t_val)) / 3
+    u_l = get_exact_wave(x[1] - dx, t_val)
+    u_r = get_exact_wave(x[Nx] + dx, t_val)
 
-    du[idx[1, 2]] = (u_l - 2 * u[idx[1, 1]] + u[idx[2, 1]]) / (dx[1]^2)
-    du[idx[Nx, 2]] = (u[idx[Nx - 1, 1]] - 2 * u[idx[Nx, 1]] + u_r) / (dx[Nx - 1]^2)
+    du[idx[1, 2]] = (u_l - 2 * u[idx[1, 1]] + u[idx[2, 1]]) / (dx^2)
+    du[idx[Nx, 2]] = (u[idx[Nx - 1, 1]] - 2 * u[idx[Nx, 1]] + u_r) / (dx^2)
 
     return nothing
 end
 
-function lhs!(du, u, p, it)
-    Nx, t, Nt, dt = p 
-    fill!(du, zero(eltype(u)))
-    idx = LinearIndices((Nx, 2, Nt))
-    idx_x = LinearIndices((Nx, 2))
-    for ix in 1:Nx
-        du[idx_x[ix, 1]] = (u[idx[ix, 1, it]] - u[idx[ix, 1, it - 1]]) / dt[it - 1]
-    end
-
-    for ix in 1:Nx
-        du[idx_x[ix, 2]] = (u[idx[ix, 2, it]] - u[idx[ix, 2, it - 1]]) / dt[it - 1]
-    end
+function timestep!(timestep_mem, u_timestep, u, t, dt, p)
+    x, Nx, dx = p
+    u_timestep .= u
+    du = @view(timestep_mem[1:length(u_timestep)])
+    du .= zero(eltype(u_timestep))
+    
+    f!(du, u_timestep, p, t)
+    
+    idx = LinearIndices((Nx, 2))
+    
+    u_timestep[idx[:, 2]] .+= dt .* du[idx[:, 2]]
+    u_timestep[idx[:, 1]] .+= dt .* u_timestep[idx[:, 2]]
+    
     return nothing
 end
