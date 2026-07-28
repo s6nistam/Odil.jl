@@ -9,8 +9,10 @@ function odil_timestepping(problem::OdilProblem, odil_func, filename_prefix; t_c
 
     if start_state === nothing
         state = OdilState(u_iter0, 1)
+        start_iter = 1
     else
         state = start_state
+        start_iter = Int(ceil((state.it_last - 1)/(t_chunk_size - 1))) + 1
     end
 
     if odil_func == odil_gauss_newton
@@ -20,7 +22,7 @@ function odil_timestepping(problem::OdilProblem, odil_func, filename_prefix; t_c
         colors = fast_coloring(jac_sparse, ColoringProblem(), GreedyColoringAlgorithm())
     end
 
-    for iter in 1:Int(ceil((Nt - 1)/(t_chunk_size - 1)))
+    for iter in start_iter:Int(ceil((Nt - 1)/(t_chunk_size - 1)))
         it_start = state.it_last
         it_end = min(it_start + t_chunk_size - 1, Nt)
 
