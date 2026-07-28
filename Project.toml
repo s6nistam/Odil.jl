@@ -5,7 +5,9 @@ authors = ["Nico Stamos <tstamos@uni-koeln.de>"]
 
 [deps]
 ADTypes = "47edcb42-4c32-4615-8424-f2b9edc5f35b"
+CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
 ColorSchemes = "35d6a980-a343-548e-a6ea-1d62b119f2f4"
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 Enzyme = "7da242da-08ed-463a-9acd-ee780be4f1d9"
 FiniteDifferences = "26cc04aa-876d-5657-8c51-4c34ba976000"
 ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"
@@ -26,7 +28,9 @@ WriteVTK = "64499a7a-5c06-52f2-abe2-ccb03c286192"
 
 [compat]
 ADTypes = "1.22.2"
+CSV = "0.10.16"
 ColorSchemes = "3.31.0"
+DataFrames = "1.8.2"
 Enzyme = "0.13.190"
 FiniteDifferences = "0.12.34"
 ForwardDiff = "1.4.1"

@@ -28,3 +28,4 @@ res = odil_gauss_newton(problem; max_iterations = 20, u_iter0 = vec(repeat(ode.u
 plot(problem, u_exact, res)
 
 write_vtk(problem, res, "odil_2d_advection_gauss_newton")
+# write_csv(problem, res, "odil_2d_advection_gauss_newton")

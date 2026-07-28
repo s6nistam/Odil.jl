@@ -28,3 +28,4 @@ res = odil_timestepping(problem, odil_gauss_newton, "odil_1d_advection_gauss_new
 plot(problem, u_exact, res)
 
 write_vtk(problem, res, "odil_1d_advection_gauss_newton")
+# write_csv(problem, res, "odil_1d_advection_gauss_newton")
