@@ -11,12 +11,16 @@ function get_jac_sparse(timestep, p_timestep, timestep_alloc_size, t, Nref, Nx, 
     u_timestep_out = zeros(eltype(u0), Nx)
     timestep_mem = zeros(eltype(u0), timestep_alloc_size)
     d_timestep_mem = zeros(eltype(u0), timestep_alloc_size)
-    jac_timestep = zeros(eltype(u0), Nx, Nx)
-    
+
+    I_timestep = Int[]
+    J_timestep = Int[]
+    d_u = zeros(eltype(u0), Nx)
+    d_u_timestep = zeros(eltype(u0), Nx)
+
     for i in 1:Nx
-        d_u = zeros(eltype(u0), Nx)
-        d_u[i] = 1.0 
-        d_u_timestep = zeros(eltype(u0), Nx)
+        d_u .= zero(eltype(u0))
+        d_u_timestep .= zero(eltype(u0))
+        d_u[i] = one(eltype(u0)) 
         
         Enzyme.autodiff(
             Enzyme.Forward, 
@@ -28,10 +32,14 @@ function get_jac_sparse(timestep, p_timestep, timestep_alloc_size, t, Nref, Nx, 
             Enzyme.Const(t[2] - t[1]),
             Enzyme.Const(p_timestep), 
         )
-        jac_timestep[:, i] = d_u_timestep
+
+        for row in findall(!iszero, d_u_timestep)
+            push!(I_timestep, row)
+            push!(J_timestep, i)
+        end
     end
-    jac_timestep_bool = sparse(jac_timestep .!= 0)
-    I_timestep, J_timestep, _ = findnz(jac_timestep_bool)
+
+
     for it in 2:Nt
         for k in eachindex(I_timestep)
             row = Nref + (it - 2) * Nx + I_timestep[k]

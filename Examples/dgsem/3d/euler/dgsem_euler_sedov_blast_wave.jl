@@ -88,7 +88,7 @@ boundary_conditions = boundary_condition_sedov_self_gravity
 
 surface_flux = flux_hll
 volume_flux = flux_ranocha
-polydeg = 2
+polydeg = 3
 basis = LobattoLegendreBasis(polydeg)
 
 volume_integral = VolumeIntegralPureLGLFiniteVolume(flux_hll)
@@ -105,7 +105,7 @@ solver = DGSEM(basis, surface_flux, volume_integral)
 coordinates_min = (-4.0, -4.0, -4.0)
 coordinates_max = (4.0, 4.0, 4.0)
 mesh = TreeMesh(coordinates_min, coordinates_max,
-                initial_refinement_level = 2,
+                initial_refinement_level = 3,
                 n_cells_max = 1_000_000,
                 periodicity = false)
 
