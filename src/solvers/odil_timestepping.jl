@@ -1,4 +1,4 @@
-function odil_timestepping(problem::OdilProblem, odil_func, filename_prefix; t_chunk_size::Int = 2, start_state = nothing, max_iterations_per_chunk = 20)
+function odil_timestepping(problem::OdilProblem, odil_func, filename_prefix; t_chunk_size::Int = 2, start_state = nothing, max_iterations_per_chunk = 20, info_prints = true, sub_solver_info_prints = false)
     Nt = length(problem.t)
     N_coords = problem.N_coords
     Nref = length(problem.u_reference_vals)
@@ -16,9 +16,13 @@ function odil_timestepping(problem::OdilProblem, odil_func, filename_prefix; t_c
     end
 
     if odil_func == odil_gauss_newton
-        println("Computing Jacobian sparsity pattern...")
+        if info_prints
+            println("Computing Jacobian sparsity pattern...")
+        end
         jac_sparse = get_jac_sparse(problem.timestep, problem.p_timestep, problem.timestep_alloc_size, problem.t[1 : t_chunk_size], Nref, N_coords, t_chunk_size, problem.reference_val_indices, problem.extra, problem.p_extra, problem.len_extra, u_iter0)
-        println("Computing coloring for Jacobian sparsity pattern...")
+        if info_prints
+            println("Computing coloring for Jacobian sparsity pattern...")
+        end
         colors = fast_coloring(jac_sparse, ColoringProblem(), GreedyColoringAlgorithm())
     end
 
@@ -45,15 +49,20 @@ function odil_timestepping(problem::OdilProblem, odil_func, filename_prefix; t_c
         end
 
         problem_chunk = OdilProblem(problem.timestep, problem.p_timestep, problem.N_coords, u_reference_vals, reference_val_indices, problem.t[it_start:it_end], problem.xyz...; extra = problem.extra, p_extra = problem.p_extra, len_extra = problem.len_extra, u_iter0 = u_iter0, timestep_alloc_size = problem.timestep_alloc_size)
-        println("Solving chunk $iter: time steps $it_start to $it_end")
+        if info_prints
+            println("Solving chunk $iter: time steps $it_start to $it_end")
+        end
         if odil_func == odil_gauss_newton
-            res_chunk = odil_func(problem_chunk; info_prints = false, jac_sparse = jac_sparse, colors = colors, max_iterations = max_iterations_per_chunk)
+            res_chunk = odil_func(problem_chunk; info_prints = sub_solver_info_prints, jac_sparse = jac_sparse, colors = colors, max_iterations = max_iterations_per_chunk)
         else
-            res_chunk = odil_func(problem_chunk; info_prints = false, max_iterations = max_iterations_per_chunk)
+            res_chunk = odil_func(problem_chunk; info_prints = sub_solver_info_prints, max_iterations = max_iterations_per_chunk)
         end
         res[:, it_start:it_end] = res_chunk
 
         state = OdilState(res_chunk, it_end)
+        if info_prints
+            println("Writing state to file: ", filename_prefix * "_iter$iter.h5")
+        end
         write_h5(state, filename_prefix * "_iter$iter.h5")
     end
     return res

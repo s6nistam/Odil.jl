@@ -59,7 +59,9 @@ function odil_lbfgs(timestep, p_timestep, N_coords, u_reference_vals, reference_
     callback = function (state)
         iter[] += 1
         if iter[] % 10 == 0 || iter[] == 1
-            println("Iteration ", iter[], ": Loss = ", state.f_x, " Loss gradient = ", norm(state.g_x))
+            if info_prints
+                println("Iteration ", iter[], ": Loss = ", state.f_x, " Loss gradient = ", norm(state.g_x))
+            end
 
             plot(problem, state.x)
         end

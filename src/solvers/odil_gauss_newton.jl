@@ -68,8 +68,10 @@ function odil_gauss_newton(timestep, p_timestep, N_coords, u_reference_vals, ref
     # opt = LevenbergMarquardt(autodiff = AutoEnzyme(), damping_initial = 0.01)
 
     callback = function (cache, iter)
-        println("Iteration ", iter, ": Loss = ", norm(cache.fu), " descent direction = ", norm(get_du(cache.descent_cache)))
-        
+        if info_prints
+            println("Iteration ", iter, ": Loss = ", norm(cache.fu), " descent direction = ", norm(get_du(cache.descent_cache)))
+        end
+
         plot(problem, cache.u)
         return false 
     end
