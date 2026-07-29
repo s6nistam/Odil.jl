@@ -23,7 +23,7 @@ p_timestep = (ode.f, ode.p)
 problem = OdilProblem(timestep!, p_timestep, Nx, ode.u0, 1:length(ode.u0), t, x; timestep_alloc_size = 2 * Nx)
 # problem = OdilProblem(timestep!, p_timestep, Nx, ode.u0, 1:length(ode.u0), t, x; timestep_alloc_size = Nx)
 # res = odil_gauss_newton(problem; max_iterations = 200)
-res = odil_timestepping(problem, odil_gauss_newton, "odil_1d_advection_gauss_newton"; t_chunk_size = 10, max_iterations = 200)
+res = odil_timestepping(problem, odil_gauss_newton, "odil_1d_advection_gauss_newton"; t_chunk_size = 10, max_iterations_per_chunk = 200)
 
 plot(problem, u_exact, res)
 

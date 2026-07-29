@@ -22,7 +22,7 @@ timestep! = get_timestep(Odil.CarpenterKennedy2N54())
 p_timestep = (ode.f, ode.p)
 
 problem = OdilProblem(timestep!, p_timestep, Nx, ode.u0, 1:length(ode.u0), t, x, y, z ; timestep_alloc_size = 2 * Nx)
-res = odil_timestepping(problem, odil_gauss_newton, "odil_3d_euler_sedov_blast_wave_gauss_newton"; t_chunk_size = 4, max_iterations = 200)
+res = odil_timestepping(problem, odil_gauss_newton, "odil_3d_euler_sedov_blast_wave_gauss_newton"; t_chunk_size = 4, max_iterations_per_chunk = 200)
 # res = odil_gauss_newton(problem; max_iterations = 10)
 
 plot(problem, u_exact, res)

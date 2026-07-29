@@ -22,7 +22,7 @@ p_timestep = (ode.f, ode.p)
 
 problem = OdilProblem(timestep!, p_timestep, Nx, ode.u0, 1:length(ode.u0), t, x, y; timestep_alloc_size = 2 * Nx)
 
-res = odil_timestepping(problem, odil_gauss_newton, "odil_2d_blast_wave_gauss_newton"; t_chunk_size = 8, max_iterations = 20)
+res = odil_timestepping(problem, odil_gauss_newton, "odil_2d_blast_wave_gauss_newton"; t_chunk_size = 8, max_iterations_per_chunk = 20)
 # res = odil_gauss_newton(problem; max_iterations = 100, u_iter0 = repeat(ode.u0, Nt))
 
 plot(problem, u_exact, res)
