@@ -1,9 +1,9 @@
 using SciMLBase, NonlinearSolveFirstOrder, ADTypes, Enzyme, LinearAlgebra, Symbolics, SparseArrays, SparseMatrixColorings
 
-function odil_gauss_newton(problem::OdilProblem; max_iterations = 2, timestep_alloc_size = problem.timestep_alloc_size, extra = problem.extra, p_extra = problem.p_extra, len_extra = problem.len_extra, u_iter0 = problem.u_iter0, autodiff = AutoEnzyme(), info_prints = true, jac_sparse = nothing, colors = nothing)
+function odil_gauss_newton(problem::OdilProblem; max_iterations = 2, timestep_alloc_size = problem.timestep_alloc_size, extra = problem.extra, p_extra = problem.p_extra, len_extra = problem.len_extra, u_iter0 = problem.u_iter0, info_prints = true, jac_sparse = nothing, colors = nothing)
     return odil_gauss_newton(problem.timestep, problem.p_timestep, problem.N_coords, problem.u_reference_vals, problem.reference_val_indices, problem.t; max_iterations = max_iterations, timestep_alloc_size = timestep_alloc_size, extra = extra, p_extra = p_extra, len_extra = len_extra, u_iter0 = u_iter0, autodiff = autodiff, problem = problem, info_prints = info_prints, jac_sparse = jac_sparse, colors = colors)
 end
-function odil_gauss_newton(timestep, p_timestep, N_coords, u_reference_vals, reference_val_indices, t; max_iterations = 2, timestep_alloc_size = 0, extra = nothing,  p_extra = nothing, len_extra = 0, u_iter0 = nothing, autodiff = AutoEnzyme(), problem = nothing, info_prints = true, jac_sparse = nothing, colors = nothing)
+function odil_gauss_newton(timestep, p_timestep, N_coords, u_reference_vals, reference_val_indices, t; max_iterations = 2, timestep_alloc_size = 0, extra = nothing,  p_extra = nothing, len_extra = 0, u_iter0 = nothing, problem = nothing, info_prints = true, jac_sparse = nothing, colors = nothing)
     Nref = length(u_reference_vals)
     Nt = length(t)
     p_iter = Ref(0)
@@ -64,8 +64,8 @@ function odil_gauss_newton(timestep, p_timestep, N_coords, u_reference_vals, ref
     
     optf = NonlinearFunction(operator_loss!, resid_prototype = resid_prototype, jac_prototype = jac_sparse, colorvec = colors)
     prob = NonlinearLeastSquaresProblem(optf, u_iter0, p_all)
-    opt = GaussNewton(autodiff = autodiff)
-    # opt = LevenbergMarquardt(autodiff = autodiff, damping_initial = 0.01)
+    opt = GaussNewton(autodiff = AutoEnzyme())
+    # opt = LevenbergMarquardt(autodiff = AutoEnzyme(), damping_initial = 0.01)
 
     callback = function (cache, iter)
         println("Iteration ", iter, ": Loss = ", norm(cache.fu), " descent direction = ", norm(get_du(cache.descent_cache)))
