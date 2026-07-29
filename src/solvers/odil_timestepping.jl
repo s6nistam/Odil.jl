@@ -61,9 +61,9 @@ function odil_timestepping(problem::OdilProblem, odil_func, filename_prefix; t_c
 
         state = OdilState(res_chunk, it_end)
         if info_prints
-            println("Writing state to file: ", filename_prefix * "_iter$iter.h5")
+            println("Writing state to file: ", filename_prefix * "_chunk$iter.h5")
         end
-        write_h5(state, filename_prefix * "_iter$iter.h5")
+        write_h5(state, filename_prefix * "_chunk$iter.h5")
     end
     return res
 end
@@ -79,8 +79,8 @@ function reconstruct_solution_from_chunks(problem::OdilProblem, filename_prefix;
         it_start = (iter - 1) * (t_chunk_size - 1) + 1
         it_end = min(it_start + t_chunk_size - 1, Nt)
 
-        if isfile(filename_prefix * "_iter$iter.h5")
-            state = read_h5(filename_prefix * "_iter$iter.h5")
+        if isfile(filename_prefix * "_chunk$iter.h5")
+            state = read_h5(filename_prefix * "_chunk$iter.h5")
             res[idx[:, it_start:it_end]] = state.u[idx_chunk[:, 1:(it_end - it_start + 1)]]
         else
             return res
