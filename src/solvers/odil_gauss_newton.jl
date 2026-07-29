@@ -1,9 +1,9 @@
 using SciMLBase, NonlinearSolveFirstOrder, ADTypes, Enzyme, LinearAlgebra, Symbolics, SparseArrays, SparseMatrixColorings
 
-function odil_gauss_newton(problem::OdilProblem; max_iterations = 2, info_prints = true, jac_sparse = nothing, colors = nothing)
-    return odil_gauss_newton(problem.timestep, problem.p_timestep, problem.N_coords, problem.u_reference_vals, problem.reference_val_indices, problem.t; max_iterations = max_iterations, timestep_alloc_size = problem.timestep_alloc_size, extra = problem.extra, p_extra = problem.p_extra, len_extra = problem.len_extra, u_iter0 = problem.u_iter0, problem = problem, info_prints = info_prints, jac_sparse = jac_sparse, colors = colors)
+function odil_gauss_newton(problem::OdilProblem; max_iterations = 2, info_prints = true, callback_set = OdilCallbackSet(), jac_sparse = nothing, colors = nothing)
+    return odil_gauss_newton(problem.timestep, problem.p_timestep, problem.N_coords, problem.u_reference_vals, problem.reference_val_indices, problem.t; max_iterations = max_iterations, timestep_alloc_size = problem.timestep_alloc_size, extra = problem.extra, p_extra = problem.p_extra, len_extra = problem.len_extra, u_iter0 = problem.u_iter0, problem = problem, info_prints = info_prints, callback_set = callback_set, jac_sparse = jac_sparse, colors = colors)
 end
-function odil_gauss_newton(timestep, p_timestep, N_coords, u_reference_vals, reference_val_indices, t; max_iterations = 2, timestep_alloc_size = 0, extra = nothing,  p_extra = nothing, len_extra = 0, u_iter0 = nothing, problem = nothing, info_prints = true, jac_sparse = nothing, colors = nothing)
+function odil_gauss_newton(timestep, p_timestep, N_coords, u_reference_vals, reference_val_indices, t; max_iterations = 2, timestep_alloc_size = 0, extra = nothing,  p_extra = nothing, len_extra = 0, u_iter0 = nothing, problem = nothing, info_prints = true, callback_set = OdilCallbackSet(), jac_sparse = nothing, colors = nothing)
     Nref = length(u_reference_vals)
     Nt = length(t)
     p_iter = Ref(0)
@@ -67,12 +67,12 @@ function odil_gauss_newton(timestep, p_timestep, N_coords, u_reference_vals, ref
     opt = GaussNewton(autodiff = AutoEnzyme())
     # opt = LevenbergMarquardt(autodiff = AutoEnzyme(), damping_initial = 0.01)
 
-    callback = function (cache, iter)
-        if info_prints
-            println("Iteration ", iter, ": Loss = ", norm(cache.fu), " descent direction = ", norm(get_du(cache.descent_cache)))
-        end
+    if info_prints
+        add!(callback_set, InfoPrintCallback())
+    end
 
-        plot(problem, cache.u)
+    callback = function (cache, iter)
+        callback_set(problem, cache.u, cache.fu, cache.jac_cache.J, iter)
         return false 
     end
     
@@ -86,9 +86,7 @@ function odil_gauss_newton(timestep, p_timestep, N_coords, u_reference_vals, ref
         p_iter[] = iter
         step!(cache)
         
-        if iter % 50 == 0 || iter == 1
-            callback(cache, iter)
-        end
+        callback(cache, iter)
         
         if cache.retcode != SciMLBase.ReturnCode.Default
             break

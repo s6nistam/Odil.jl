@@ -30,8 +30,10 @@ max_iterations = 100
 p_extra = (Nx, dx, Nt, dt)
 len_extra = (Nx - 2) * (Nt - 1) * 2
 
+callback_set = OdilCallbackSet(PlotCallback(100))
+
 problem = OdilProblem(timestep!, p, Nx, u_reference_vals, reference_val_indices, t, x; extra = extra, p_extra = p_extra, len_extra = len_extra, timestep_alloc_size = Nx)
-u = odil_gauss_newton(problem; max_iterations = max_iterations)
+u = odil_gauss_newton(problem; max_iterations = max_iterations, callback_set = callback_set)
 
 u = reshape(u, Nx, Nt)
 

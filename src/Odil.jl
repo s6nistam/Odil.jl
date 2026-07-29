@@ -2,6 +2,7 @@ module Odil
 
 include("solvers/solvers.jl")
 include("io/io.jl")
+include("callbacks/callbacks.jl")
 include("sparsity/sparsity.jl")
 include("time_integration/time_integration.jl")
 include("visualization/visualization.jl")

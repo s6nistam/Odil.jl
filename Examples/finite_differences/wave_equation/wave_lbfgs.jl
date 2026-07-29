@@ -34,8 +34,10 @@ idx_t_t0  = [idx[ix, 2, 1] for ix in 1:Nx]
 
 reference_val_indices = [idx_t0; idx_bounds_left; idx_bounds_right; idx_t_t0]
 
+callback_set = OdilCallbackSet(PlotCallback(100))
+
 problem = OdilProblem(timestep!, p, 2 * Nx, u_reference_vals, reference_val_indices, t, x; timestep_alloc_size = 2 * Nx)
-u = odil_lbfgs(problem; max_iterations = 100000)
+u = odil_lbfgs(problem; max_iterations = 100000, callback_set = callback_set)
 
 u = reshape(u, Nx, 2, Nt)
 

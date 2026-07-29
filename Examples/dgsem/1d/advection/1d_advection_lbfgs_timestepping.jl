@@ -19,7 +19,9 @@ u_exact = reduce(hcat, vec.(sol.u))
 timestep! = get_timestep(Odil.CarpenterKennedy2N54())
 p_timestep = (ode.f, ode.p)
 
+callback_set = OdilCallbackSet(PlotCallback(100))
+
 problem = OdilProblem(timestep!, p_timestep, Nx, ode.u0, 1:length(ode.u0), t, x; timestep_alloc_size = 2 * Nx)
-res = odil_timestepping(problem, odil_lbfgs, "odil_1d_advection_lbfgs"; t_chunk_size = 10, max_iterations_per_chunk = 200)
+res = odil_timestepping(problem, odil_lbfgs, "odil_1d_advection_lbfgs"; t_chunk_size = 10, max_iterations_per_chunk = 200, callback_set = callback_set)
 
 plot(problem, u_exact, res)

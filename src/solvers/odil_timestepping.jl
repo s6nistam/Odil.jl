@@ -1,4 +1,4 @@
-function odil_timestepping(problem::OdilProblem, odil_func, filename_prefix; t_chunk_size::Int = 2, start_state = nothing, max_iterations_per_chunk = 20, info_prints = true, sub_solver_info_prints = false)
+function odil_timestepping(problem::OdilProblem, odil_func, filename_prefix; t_chunk_size::Int = 2, start_state = nothing, max_iterations_per_chunk = 20, info_prints = true, sub_solver_info_prints = false, callback_set = OdilCallbackSet())
     Nt = length(problem.t)
     N_coords = problem.N_coords
     Nref = length(problem.u_reference_vals)
@@ -53,9 +53,9 @@ function odil_timestepping(problem::OdilProblem, odil_func, filename_prefix; t_c
             println("Solving chunk $iter: time steps $it_start to $it_end")
         end
         if odil_func == odil_gauss_newton
-            res_chunk = odil_func(problem_chunk; info_prints = sub_solver_info_prints, jac_sparse = jac_sparse, colors = colors, max_iterations = max_iterations_per_chunk)
+            res_chunk = odil_func(problem_chunk; info_prints = sub_solver_info_prints, callback_set = callback_set, jac_sparse = jac_sparse, colors = colors, max_iterations = max_iterations_per_chunk)
         else
-            res_chunk = odil_func(problem_chunk; info_prints = sub_solver_info_prints, max_iterations = max_iterations_per_chunk)
+            res_chunk = odil_func(problem_chunk; info_prints = sub_solver_info_prints, callback_set = callback_set, max_iterations = max_iterations_per_chunk)
         end
         res[:, it_start:it_end] = res_chunk
 

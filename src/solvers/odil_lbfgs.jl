@@ -1,10 +1,10 @@
 using SciMLBase, Optim, ADTypes, Enzyme, LinearAlgebra
 
-function odil_lbfgs(problem::OdilProblem; max_iterations = 100000, info_prints = true)
-    return odil_lbfgs(problem.timestep, problem.p_timestep, problem.N_coords, problem.u_reference_vals, problem.reference_val_indices, problem.t; max_iterations = max_iterations, timestep_alloc_size = problem.timestep_alloc_size, extra = problem.extra, p_extra = problem.p_extra, len_extra = problem.len_extra, u_iter0 = problem.u_iter0, problem = problem, info_prints = info_prints)
+function odil_lbfgs(problem::OdilProblem; max_iterations = 100000, info_prints = true, callback_set = OdilCallbackSet())
+    return odil_lbfgs(problem.timestep, problem.p_timestep, problem.N_coords, problem.u_reference_vals, problem.reference_val_indices, problem.t; max_iterations = max_iterations, timestep_alloc_size = problem.timestep_alloc_size, extra = problem.extra, p_extra = problem.p_extra, len_extra = problem.len_extra, u_iter0 = problem.u_iter0, problem = problem, info_prints = info_prints, callback_set = callback_set)
 end
 
-function odil_lbfgs(timestep, p_timestep, N_coords, u_reference_vals, reference_val_indices, t; max_iterations = 100000, timestep_alloc_size = 0, extra = nothing,  p_extra = nothing, len_extra = 0, u_iter0 = nothing, problem = nothing, info_prints = true)
+function odil_lbfgs(timestep, p_timestep, N_coords, u_reference_vals, reference_val_indices, t; max_iterations = 100000, timestep_alloc_size = 0, extra = nothing,  p_extra = nothing, len_extra = 0, u_iter0 = nothing, problem = nothing, info_prints = true, callback_set = OdilCallbackSet())
     Nref = length(u_reference_vals)
     Nt = length(t)
     num_unknowns = N_coords * Nt
@@ -56,15 +56,13 @@ function odil_lbfgs(timestep, p_timestep, N_coords, u_reference_vals, reference_
     opt = LBFGS()
     optf = Enzyme.Const((u_vec) -> loss(u_vec, p_all))
 
+    if info_prints
+        add!(callback_set, InfoPrintCallback())
+    end
+
     callback = function (state)
         iter[] += 1
-        if iter[] % 10 == 0 || iter[] == 1
-            if info_prints
-                println("Iteration ", iter[], ": Loss = ", state.f_x, " Loss gradient = ", norm(state.g_x))
-            end
-
-            plot(problem, state.x)
-        end
+        callback_set(problem, state.x, state.f_x, state.g_x, iter[])
         return false
     end
     
