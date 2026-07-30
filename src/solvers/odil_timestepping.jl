@@ -19,7 +19,8 @@ function odil_timestepping(problem::OdilProblem, odil_func, filename_prefix; t_c
         if info_prints
             println("Computing Jacobian sparsity pattern...")
         end
-        jac_sparse = get_jac_sparse(problem.timestep, problem.p_timestep, problem.timestep_alloc_size, problem.t[1 : t_chunk_size], Nref, N_coords, t_chunk_size, problem.reference_val_indices, problem.extra, problem.p_extra, problem.len_extra, u_iter0)
+        problem_jac = OdilProblem(problem.timestep, problem.p_timestep, problem.N_coords, problem.u_reference_vals, problem.reference_val_indices, problem.t[1:t_chunk_size], problem.xyz...; extra = problem.extra, p_extra = problem.p_extra, len_extra = problem.len_extra, u_iter0 = u_iter0, timestep_alloc_size = problem.timestep_alloc_size)
+        jac_sparse = get_jac_sparse(problem_jac)
         if info_prints
             println("Computing coloring for Jacobian sparsity pattern...")
         end

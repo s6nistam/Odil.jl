@@ -55,7 +55,7 @@ function odil_gauss_newton(timestep, p_timestep, N_coords, u_reference_vals, ref
         if info_prints
             println("Computing Jacobian sparsity pattern...")
         end
-        jac_sparse = get_jac_sparse(timestep, p_timestep, timestep_alloc_size, t, Nref, N_coords, Nt, reference_val_indices, extra, p_extra, len_extra, u_iter0)
+        jac_sparse = get_jac_sparse(problem)
     end
 
     if colors === nothing
