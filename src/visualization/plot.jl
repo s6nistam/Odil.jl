@@ -15,7 +15,7 @@ function show_figure(fig; variable = nothing)
     return fig
 end
 
-function plot_1d_time_comparison(x, t, u_exact, u_approx; variable = nothing)
+function plot_1d_time_comparison(x, t, u_exact, u_approx)
 
     z_min = min(minimum(u_exact), minimum(u_approx))
     z_max = max(maximum(u_exact), maximum(u_approx))
@@ -30,12 +30,12 @@ function plot_1d_time_comparison(x, t, u_exact, u_approx; variable = nothing)
 
     Colorbar(fig[1, 3], hm1, label = "Value")
 
-    show_figure(fig; variable = variable)
+    show_figure(fig)
 
     return fig
 end
 
-function plot_1d_time(x, t, u; variable = nothing)
+function plot_1d_time(x, t, u)
 
     z_min = minimum(u)
     z_max = maximum(u)
@@ -47,7 +47,7 @@ function plot_1d_time(x, t, u; variable = nothing)
 
     Colorbar(fig[1, 2], hm, label = "Value")
 
-    show_figure(fig; variable = variable)
+    show_figure(fig)
 
     return fig
 end
