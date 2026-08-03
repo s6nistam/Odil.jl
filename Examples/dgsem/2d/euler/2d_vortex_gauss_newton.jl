@@ -22,7 +22,7 @@ p_timestep = (ode.f, ode.p)
 
 callback_set = OdilCallbackSet(PlotCallback(100))
 
-problem = OdilProblem(timestep!, p_timestep, Nx, ode.u0, 1:length(ode.u0), t, x, y; timestep_alloc_size = 2 * Nx)
-res = odil_gauss_newton(problem; max_iterations = 100, u_iter0 = repeat(ode.u0, Nt), callback_set = callback_set)
+problem = OdilProblem(timestep!, p_timestep, Nx, ode.u0, 1:length(ode.u0), t, x, y; timestep_alloc_size = 2 * Nx, u_iter0 = repeat(ode.u0, Nt))
+res = odil_gauss_newton(problem; max_iterations = 100, callback_set = callback_set)
 
 plot(problem, u_exact, res)
