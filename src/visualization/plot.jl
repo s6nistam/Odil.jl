@@ -7,8 +7,12 @@ function show_figure(fig; variable = nothing)
     if variable === nothing
         display(fig)
     else
-        screen = get!(plot_screens, variable) do
-            GLMakie.Screen()
+        screen = get(plot_screens, variable, nothing)
+        if screen === nothing || !isopen(screen)
+            screen = GLMakie.Screen()
+            plot_screens[variable] = screen
+        else
+            empty!(screen) # Clear existing scene/plots from GPU & screen
         end
         display(screen, fig)
     end
@@ -56,8 +60,11 @@ function plot_fe_1d_time(x, e, u; variable = nothing,
     c_min = nothing, c_max = nothing)
 
     fig = Figure(size = (400, 400))
-    it = Observable(1)
     ax = Axis(fig[1, 1], xlabel = "x")
+
+    sg = SliderGrid(fig[2, 1],
+        (label = "Time Step", range = 1:size(u, 3), startvalue = 1))
+    it = sg.sliders[1].value
 
     if c_min === nothing
         c_min = minimum(u)
@@ -81,15 +88,7 @@ function plot_fe_1d_time(x, e, u; variable = nothing,
             transparency = true, 
         )
     end
-        Colorbar(fig[1, 2], limits=(c_min, c_max), label = "Value")
-
-
-    sg = SliderGrid(fig[2, 1],
-        (label = "Time Step", range = 1:size(u, 3), startvalue = 1))
-    
-    on(sg.sliders[1].value) do val
-        it[] = val
-    end
+    Colorbar(fig[1, 2], limits=(c_min, c_max), label = "Value")
 
     show_figure(fig; variable = variable)
 
@@ -100,9 +99,12 @@ function plot_fe_1d_time_compare(x, e, u_exact, u_approx;
     c_min = nothing, c_max = nothing, variable = nothing)
 
     fig = Figure(size = (800, 400))
-    it = Observable(1)
     ax_exact = Axis(fig[1, 1], xlabel = "x", title = "Exact Solution")
     ax_approx = Axis(fig[1, 2], xlabel = "x", title = "Approximate Solution")
+
+    sg = SliderGrid(fig[2, :],
+        (label = "Time Step", range = 1:size(u_exact, 3), startvalue = 1))
+    it = sg.sliders[1].value
 
     if c_min === nothing
         c_min = minimum(u_exact)
@@ -138,15 +140,7 @@ function plot_fe_1d_time_compare(x, e, u_exact, u_approx;
             transparency = true, 
         )
     end
-        Colorbar(fig[1, 3], limits=(c_min, c_max), label = "Value")
-
-
-    sg = SliderGrid(fig[2, :],
-        (label = "Time Step", range = 1:size(u_exact, 3), startvalue = 1))
-    
-    on(sg.sliders[1].value) do val
-        it[] = val
-    end
+    Colorbar(fig[1, 3], limits=(c_min, c_max), label = "Value")
 
     show_figure(fig; variable = variable)
 
@@ -157,8 +151,11 @@ function plot_fe_2d_time(x, y, e, u;
     c_min = nothing, c_max = nothing, variable = nothing)
 
     fig = Figure(size = (400, 400))
-    it = Observable(1)
     ax = Axis(fig[1, 1], xlabel = "x", ylabel = "y")
+
+    sg = SliderGrid(fig[2, 1],
+        (label = "Time Step", range = 1:size(u, 4), startvalue = 1))
+    it = sg.sliders[1].value
 
     if c_min === nothing
         c_min = minimum(u)
@@ -183,15 +180,7 @@ function plot_fe_2d_time(x, y, e, u;
             shading = NoShading
         )
     end
-        Colorbar(fig[1, 2], limits=(c_min, c_max), label = "Value")
-
-
-    sg = SliderGrid(fig[2, 1],
-        (label = "Time Step", range = 1:size(u, 4), startvalue = 1))
-    
-    on(sg.sliders[1].value) do val
-        it[] = val
-    end
+    Colorbar(fig[1, 2], limits=(c_min, c_max), label = "Value")
 
     show_figure(fig; variable = variable)
 
@@ -202,9 +191,12 @@ function plot_fe_2d_time_compare(x, y, e, u_exact, u_approx;
     c_min = nothing, c_max = nothing, variable = nothing)
 
     fig = Figure(size = (800, 400))
-    it = Observable(1)
     ax_exact = Axis(fig[1, 1], xlabel = "x", ylabel = "y", title = "Exact Solution")
     ax_approx = Axis(fig[1, 2], xlabel = "x", ylabel = "y", title = "Approximate Solution")
+
+    sg = SliderGrid(fig[2, :],
+        (label = "Time Step", range = 1:size(u_exact, 4), startvalue = 1))
+    it = sg.sliders[1].value
 
     if c_min === nothing
         c_min = minimum(u_exact)
@@ -241,15 +233,7 @@ function plot_fe_2d_time_compare(x, y, e, u_exact, u_approx;
             shading = NoShading
         )
     end
-        Colorbar(fig[1, 3], limits=(c_min, c_max), label = "Value")
-
-
-    sg = SliderGrid(fig[2, :],
-        (label = "Time Step", range = 1:size(u_exact, 4), startvalue = 1))
-    
-    on(sg.sliders[1].value) do val
-        it[] = val
-    end
+    Colorbar(fig[1, 3], limits=(c_min, c_max), label = "Value")
 
     show_figure(fig; variable = variable)
 
@@ -308,8 +292,11 @@ function plot_fe_3d_time(x, y, z, e, u;
     c_min = nothing, c_max = nothing, variable = nothing)
 
     fig = Figure(size = (400, 400))
-    it = Observable(1)
     ax = Axis3(fig[1, 1], xlabel = "x", ylabel = "y", zlabel = "z")
+
+    sg = SliderGrid(fig[2, 1],
+        (label = "Time Step", range = 1:size(u, 5), startvalue = 1))
+    it = sg.sliders[1].value
 
     if c_min === nothing
         c_min = minimum(u)
@@ -344,15 +331,7 @@ function plot_fe_3d_time(x, y, z, e, u;
             interpolate = true
         )
     end
-        Colorbar(fig[1, 2], limits=(c_min, c_max), label = "Value")
-
-
-    sg = SliderGrid(fig[2, 1],
-        (label = "Time Step", range = 1:size(u, 5), startvalue = 1))
-    
-    on(sg.sliders[1].value) do val
-        it[] = val
-    end
+    Colorbar(fig[1, 2], limits=(c_min, c_max), label = "Value")
 
     show_figure(fig; variable = variable)
 
@@ -363,9 +342,12 @@ function plot_fe_3d_time_compare(x, y, z, e, u_exact, u_approx;
     c_min = nothing, c_max = nothing, variable = nothing)
 
     fig = Figure(size = (800, 400))
-    it = Observable(1)
     ax_exact = Axis3(fig[1, 1], xlabel = "x", ylabel = "y", zlabel = "z", title = "Exact Solution")
     ax_approx = Axis3(fig[1, 2], xlabel = "x", ylabel = "y", zlabel = "z", title = "Approximate Solution")
+
+    sg = SliderGrid(fig[2, :],
+        (label = "Time Step", range = 1:size(u_exact, 5), startvalue = 1))
+    it = sg.sliders[1].value
 
     if c_min === nothing
         c_min = minimum(u_exact)
@@ -419,15 +401,7 @@ function plot_fe_3d_time_compare(x, y, z, e, u_exact, u_approx;
             interpolate = true
         )
     end
-        Colorbar(fig[1, 3], limits=(c_min, c_max), label = "Value")
-
-
-    sg = SliderGrid(fig[2, :],
-        (label = "Time Step", range = 1:size(u_exact, 5), startvalue = 1))
-    
-    on(sg.sliders[1].value) do val
-        it[] = val
-    end
+    Colorbar(fig[1, 3], limits=(c_min, c_max), label = "Value")
 
     show_figure(fig; variable = variable)
 
