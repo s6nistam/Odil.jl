@@ -27,7 +27,9 @@ problem = OdilProblem(timestep!, p_timestep, Nx, ode.u0, 1:length(ode.u0), t, x,
 # problem = OdilProblem(timestep!, p_timestep, Nx, ode.u0, 1:length(ode.u0), t, x, y; timestep_alloc_size = Nx)
 res = odil_gauss_newton(problem; max_iterations = 20, callback_set = callback_set)
 
-plot(problem, u_exact, res)
+# plot(problem, u_exact, res)
+diff = [u_exact[i] - res[i] for i in 1:length(res)]
+plot(problem, diff; c_min = minimum(diff), c_max = maximum(diff))
 
 write_vtk(problem, res, "odil_2d_advection_gauss_newton")
 # write_csv(problem, res, "odil_2d_advection_gauss_newton")
