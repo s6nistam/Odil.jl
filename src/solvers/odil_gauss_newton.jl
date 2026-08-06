@@ -59,6 +59,9 @@ function odil_gauss_newton(timestep, p_timestep, N_coords, u_reference_vals, ref
     end
 
     if colors === nothing
+        if info_prints
+            println("Computing coloring for Jacobian sparsity pattern...")
+        end
         colors = fast_coloring(jac_sparse, ColoringProblem(), GreedyColoringAlgorithm())
     end
     
