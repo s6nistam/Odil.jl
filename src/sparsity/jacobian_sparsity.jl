@@ -1,7 +1,13 @@
+"""
+Compute the Jacobian sparsity pattern for the ODIL least-squares residual.
+"""
 function get_jac_sparse(problem::OdilProblem)
     return get_jac_sparse(problem.timestep, problem.p_timestep, problem.timestep_alloc_size, problem.N_coords, length(problem.u_reference_vals), problem.reference_val_indices, length(problem.t), problem.t, problem.extra, problem.p_extra, problem.len_extra, problem.u_iter0)
 end
 
+"""
+Compute the Jacobian sparsity pattern directly from the low-level ODIL components.
+"""
 function get_jac_sparse(timestep, p_timestep, timestep_alloc_size, N_coords, Nref, reference_val_indices, Nt, t, extra, p_extra, len_extra, u_iter0)
     I = Int[]
     J = Int[]

@@ -1,9 +1,15 @@
 using SciMLBase, Optim, ADTypes, Enzyme, LinearAlgebra
 
+"""
+Solve an ODIL problem with an L-BFGS optimizer.
+"""
 function odil_lbfgs(problem::OdilProblem; max_iterations = 100000, info_prints = true, callback_set = OdilCallbackSet())
     return odil_lbfgs(problem.timestep, problem.p_timestep, problem.N_coords, problem.u_reference_vals, problem.reference_val_indices, problem.t; max_iterations = max_iterations, timestep_alloc_size = problem.timestep_alloc_size, extra = problem.extra, p_extra = problem.p_extra, len_extra = problem.len_extra, u_iter0 = problem.u_iter0, problem = problem, info_prints = info_prints, callback_set = callback_set)
 end
 
+"""
+Solve the ODIL problem directly from its components using a limited-memory BFGS method.
+"""
 function odil_lbfgs(timestep, p_timestep, N_coords, u_reference_vals, reference_val_indices, t; max_iterations = 100000, timestep_alloc_size = 0, extra = nothing,  p_extra = nothing, len_extra = 0, u_iter0 = nothing, problem = nothing, info_prints = true, callback_set = OdilCallbackSet())
     Nref = length(u_reference_vals)
     Nt = length(t)

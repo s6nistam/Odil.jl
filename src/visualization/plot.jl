@@ -3,6 +3,9 @@ using ColorSchemes
 
 const plot_screens = Dict{Int, GLMakie.Screen}()
 
+"""
+Display a generated Makie figure, optionally reusing a persistent screen per variable.
+"""
 function show_figure(fig; variable = nothing)
     if variable === nothing
         display(fig)
@@ -19,6 +22,9 @@ function show_figure(fig; variable = nothing)
     return fig
 end
 
+"""
+Create a side-by-side heatmap comparison for a 1D solution and its reference.
+"""
 function plot_1d_time_comparison(x, t, u_exact, u_approx)
 
     z_min = min(minimum(u_exact), minimum(u_approx))
@@ -39,6 +45,9 @@ function plot_1d_time_comparison(x, t, u_exact, u_approx)
     return fig
 end
 
+"""
+Create a heatmap of a 1D solution over space and time.
+"""
 function plot_1d_time(x, t, u)
 
     z_min = minimum(u)
@@ -56,6 +65,9 @@ function plot_1d_time(x, t, u)
     return fig
 end
 
+"""
+Visualize a 1D finite-element solution as an animated line plot over time.
+"""
 function plot_fe_1d_time(x, e, u; variable = nothing,
     c_min = nothing, c_max = nothing)
 
@@ -95,6 +107,9 @@ function plot_fe_1d_time(x, e, u; variable = nothing,
     return fig
 end
 
+"""
+Visualize an exact and approximate 1D finite-element solution side by side.
+"""
 function plot_fe_1d_time_compare(x, e, u_exact, u_approx;
     c_min = nothing, c_max = nothing, variable = nothing)
 
@@ -147,6 +162,9 @@ function plot_fe_1d_time_compare(x, e, u_exact, u_approx;
     return fig
 end
 
+"""
+Visualize a 2D finite-element solution as a time-varying surface plot.
+"""
 function plot_fe_2d_time(x, y, e, u;
     c_min = nothing, c_max = nothing, variable = nothing)
 
@@ -187,6 +205,9 @@ function plot_fe_2d_time(x, y, e, u;
     return fig
 end
 
+"""
+Visualize an exact and approximate 2D finite-element solution side by side.
+"""
 function plot_fe_2d_time_compare(x, y, e, u_exact, u_approx;
     c_min = nothing, c_max = nothing, variable = nothing)
 
@@ -240,6 +261,9 @@ function plot_fe_2d_time_compare(x, y, e, u_exact, u_approx;
     return fig
 end
 
+"""
+Interpolate a 3D finite-element field to an equidistant grid for visualization.
+"""
 function interpolate_to_equidistant(x, y, z, u)
     nx, ny, nz = size(u, 1), size(u, 2), size(u, 3)
     x_new = range(minimum(x), maximum(x), length=nx)
@@ -288,6 +312,9 @@ function interpolate_to_equidistant(x, y, z, u)
     return x_new, y_new, z_new, u_out
 end
 
+"""
+Visualize a 3D finite-element solution as a time-varying volume plot.
+"""
 function plot_fe_3d_time(x, y, z, e, u;
     c_min = nothing, c_max = nothing, variable = nothing)
 
@@ -338,6 +365,9 @@ function plot_fe_3d_time(x, y, z, e, u;
     return fig
 end
 
+"""
+Visualize an exact and approximate 3D finite-element solution side by side.
+"""
 function plot_fe_3d_time_compare(x, y, z, e, u_exact, u_approx;
     c_min = nothing, c_max = nothing, variable = nothing)
 
@@ -408,6 +438,9 @@ function plot_fe_3d_time_compare(x, y, z, e, u_exact, u_approx;
     return fig
 end
 
+"""
+Visualize the current state of a 1D ODIL solution using the configured problem geometry.
+"""
 function plot(problem::OdilProblem{1}, u_state; c_min = nothing, c_max = nothing)
     (x,) = problem.xyz
     e = 1:length(x[1, :])
@@ -418,6 +451,9 @@ function plot(problem::OdilProblem{1}, u_state; c_min = nothing, c_max = nothing
     end
 end
 
+"""
+Visualize a 1D ODIL solution and compare it to a reference solution.
+"""
 function plot(problem::OdilProblem{1}, u_exact, u_state; c_min = nothing, c_max = nothing)
     (x,) = problem.xyz
     e = 1:length(x[1, :])
@@ -429,6 +465,9 @@ function plot(problem::OdilProblem{1}, u_exact, u_state; c_min = nothing, c_max 
     end
 end
 
+"""
+Visualize the current state of a 2D ODIL solution using the configured problem geometry.
+"""
 function plot(problem::OdilProblem{2}, u_state; c_min = nothing, c_max = nothing)
     x, y = problem.xyz
     e = 1:length(x[1, 1, :])
@@ -439,6 +478,9 @@ function plot(problem::OdilProblem{2}, u_state; c_min = nothing, c_max = nothing
     end
 end
 
+"""
+Visualize a 2D ODIL solution and compare it to a reference solution.
+"""
 function plot(problem::OdilProblem{2}, u_exact, u_state; c_min = nothing, c_max = nothing)
     x, y = problem.xyz
     e = 1:length(x[1, 1, :])
@@ -450,6 +492,9 @@ function plot(problem::OdilProblem{2}, u_exact, u_state; c_min = nothing, c_max 
     end
 end
 
+"""
+Visualize the current state of a 3D ODIL solution using the configured problem geometry.
+"""
 function plot(problem::OdilProblem{3}, u_state; c_min = nothing, c_max = nothing)
     x, y, z = problem.xyz
     e = 1:length(x[1, 1, 1, :])
@@ -460,6 +505,9 @@ function plot(problem::OdilProblem{3}, u_state; c_min = nothing, c_max = nothing
     end
 end
 
+"""
+Visualize a 3D ODIL solution and compare it to a reference solution.
+"""
 function plot(problem::OdilProblem{3}, u_exact, u_state; c_min = nothing, c_max = nothing)
     x, y, z = problem.xyz
     e = 1:length(x[1, 1, 1, :])

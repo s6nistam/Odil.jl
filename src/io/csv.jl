@@ -1,5 +1,8 @@
 using CSV, DataFrames, Morton
 
+"""
+Write a 1D ODIL solution to a CSV file.
+"""
 function write_csv(problem::OdilProblem{1}, u, filename::String)
     (x,) = problem.xyz
     t = problem.t
@@ -29,6 +32,9 @@ function write_csv(problem::OdilProblem{1}, u, filename::String)
     CSV.write("$(filename).csv", df)
 end
 
+"""
+Write a 2D ODIL solution to a CSV file, restoring the element ordering from Z-order indexing.
+"""
 function write_csv(problem::OdilProblem{2}, u, filename::String)
     x, y = problem.xyz
     t = problem.t
@@ -78,6 +84,9 @@ function write_csv(problem::OdilProblem{2}, u, filename::String)
     CSV.write("$(filename).csv", df)
 end
 
+"""
+Write a 3D ODIL solution to a CSV file, restoring the element ordering from Z-order indexing.
+"""
 function write_csv(problem::OdilProblem{3}, u, filename::String)
     x, y, z = problem.xyz
     t = problem.t

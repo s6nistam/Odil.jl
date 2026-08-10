@@ -1,3 +1,8 @@
+"""
+Solve an ODIL problem in time chunks and persist each chunk state to disk.
+
+This is useful for long time horizons where a single solve is too expensive.
+"""
 function odil_timestepping(problem::OdilProblem, odil_func, filename_prefix; t_chunk_size::Int = 2, start_state = nothing, max_iterations_per_chunk = 20, info_prints = true, sub_solver_info_prints = false, callback_set = OdilCallbackSet())
     Nt = length(problem.t)
     N_coords = problem.N_coords
@@ -69,6 +74,9 @@ function odil_timestepping(problem::OdilProblem, odil_func, filename_prefix; t_c
     return res
 end
 
+"""
+Reconstruct the full solution from the chunk-wise HDF5 states written by `odil_timestepping`.
+"""
 function reconstruct_solution_from_chunks(problem::OdilProblem, filename_prefix; t_chunk_size = 2)
     N_coords = problem.N_coords
     Nt = length(problem.t)

@@ -1,3 +1,7 @@
+"""
+Represents an ODIL optimization problem consisting of a time-stepping operator, reference data,
+and the spatial coordinates used to assemble the loss function.
+"""
 struct OdilProblem{N, XYZ<:Tuple, FS, PS, T, TT, II, FE, PE}
     timestep::FS
     p_timestep::PS
@@ -25,6 +29,12 @@ struct OdilProblem{N, XYZ<:Tuple, FS, PS, T, TT, II, FE, PE}
     end
 end
 
+"""
+Construct an ODIL problem from the time-stepping routine, reference values, and coordinates.
+
+The keyword arguments allow optional regularization terms, a custom initial iterate, and
+preallocated storage for the timestep function.
+"""
 function OdilProblem(timestep, p_timestep, N_coords, u_reference_vals,
     reference_val_indices, t, xyz...; extra = nothing,  p_extra = nothing,
     len_extra = 0, u_iter0 = nothing, timestep_alloc_size = 0)
@@ -34,6 +44,10 @@ function OdilProblem(timestep, p_timestep, N_coords, u_reference_vals,
     )
 end
 
+"""
+Represents a saved ODIL state containing the solution vector and the index of the last
+included time step.
+"""
 struct OdilState{T}
     u::Vector{T}
     it_last::Int

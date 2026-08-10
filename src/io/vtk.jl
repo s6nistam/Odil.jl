@@ -1,5 +1,8 @@
 using WriteVTK, ReadVTK, Morton
 
+"""
+Write a 1D ODIL solution to a VTK file for visualization in ParaView.
+"""
 function write_vtk(problem::OdilProblem{1}, u, filename::String)
     (x,) = problem.xyz
     t = problem.t
@@ -21,6 +24,9 @@ function write_vtk(problem::OdilProblem{1}, u, filename::String)
     end
 end
 
+"""
+Write a 2D ODIL solution to a VTK collection, one file per time step.
+"""
 function write_vtk(problem::OdilProblem{2}, u, filename::String)
     x, y = problem.xyz
     t = problem.t
@@ -65,6 +71,9 @@ function write_vtk(problem::OdilProblem{2}, u, filename::String)
     end
 end
 
+"""
+Write a 3D ODIL solution to a VTK collection, one file per time step.
+"""
 function write_vtk(problem::OdilProblem{3}, u, filename::String)
     x, y, z = problem.xyz
     t = problem.t

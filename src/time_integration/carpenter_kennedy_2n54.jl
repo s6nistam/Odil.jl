@@ -1,3 +1,6 @@
+"""
+Marker type selecting the Carpenter–Kennedy 2N54 time-integration scheme.
+"""
 struct CarpenterKennedy2N54
 end
 
@@ -52,6 +55,9 @@ const ABc = [
 #     return u
 # end
 
+"""
+Advance one Carpenter–Kennedy 2N54 time step for the ODIL residual evaluation.
+"""
 function timestep_carpenter_kennedy_2n54!(timestep_mem, u_timestep, u, t, dt, p)
     f!, p_f = p
     u_timestep .= u
@@ -67,6 +73,9 @@ function timestep_carpenter_kennedy_2n54!(timestep_mem, u_timestep, u, t, dt, p)
     return nothing
 end
 
+"""
+Return the timestep function associated with the selected integration method.
+"""
 function get_timestep(method::CarpenterKennedy2N54)
     return timestep_carpenter_kennedy_2n54!
 end
