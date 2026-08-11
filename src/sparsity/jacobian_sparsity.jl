@@ -28,8 +28,9 @@ function get_jac_sparse(timestep, p_timestep, timestep_alloc_size, N_coords, Nre
     d_u_timestep = zeros(eltype(u0), N_coords)
 
     for i in 1:N_coords
-        d_u .= zero(eltype(u0))
-        d_u_timestep .= zero(eltype(u0))
+        fill!(d_timestep_mem, zero(eltype(u0)))
+        fill!(d_u, zero(eltype(u0)))
+        fill!(d_u_timestep, zero(eltype(u0)))
         d_u[i] = one(eltype(u0)) 
         
         Enzyme.autodiff(

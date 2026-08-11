@@ -1,6 +1,8 @@
 using Odil
 include("./dgsem_euler_sedov_blast_wave.jl")
 
+Trixi.TrixiBase.disable_debug_timings()
+
 polydeg = 3
 refinement_level = 3
 ndims = 3

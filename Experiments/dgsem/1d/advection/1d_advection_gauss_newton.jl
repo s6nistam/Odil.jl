@@ -1,7 +1,9 @@
 using Odil
 include("./dgsem_advection.jl")
 
-polydeg = 2
+Trixi.TrixiBase.disable_debug_timings()
+
+polydeg = 3
 refinement_level = 4
 ndims = 1
 variables = Int64(length(ode.u0)/((polydeg + 1)^ndims * (2^refinement_level)^ndims))
@@ -22,7 +24,7 @@ p_timestep = (ode.f, ode.p)
 callback_set = OdilCallbackSet(PlotCallback(100))
 
 problem = OdilProblem(timestep!, p_timestep, Nx, ode.u0, 1:length(ode.u0), t, x; timestep_alloc_size = 2 * Nx)
-res = odil_gauss_newton(problem; max_iterations = 200, callback_set = callback_set)
+res = odil_gauss_newton(problem; max_iterations = 500, callback_set = callback_set)
 
 plot(problem, u_exact, res)
 

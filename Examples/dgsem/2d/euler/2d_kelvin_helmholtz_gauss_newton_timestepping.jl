@@ -1,6 +1,8 @@
 using Odil
 include("./dgsem_euler_kelvin_helmholtz.jl")
 
+Trixi.TrixiBase.disable_debug_timings()
+
 polydeg = 3
 refinement_level = 5
 ndims = 2

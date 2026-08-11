@@ -19,6 +19,10 @@ function odil_lbfgs(timestep, p_timestep, N_coords, u_reference_vals, reference_
         u_iter0 = zeros(num_unknowns)
     end
 
+    u_timestep = zeros(eltype(u_reference_vals), N_coords * (Nt - 1))
+    timestep_mem = zeros(eltype(u_reference_vals), timestep_alloc_size * (Nt - 1))
+    du_extra = zeros(eltype(u_reference_vals), len_extra)
+
     p_all = (timestep, p_timestep, timestep_alloc_size, u_reference_vals, reference_val_indices, Nref, N_coords, Nt, t, extra, p_extra, len_extra, iter)
 
     function loss(u_vec, p)
@@ -33,21 +37,23 @@ function odil_lbfgs(timestep, p_timestep, N_coords, u_reference_vals, reference_
             l_exact += ((u_vec[idx] - u_val)^2)/Nref_inner
         end
         
-        u_timestep = zeros(eltype(u_vec), N_coords_inner)
-        timestep_mem = zeros(eltype(u_vec), timestep_alloc_size_inner)
         for it in 2:Nt_inner
-            fill!(u_timestep, zero(eltype(u_vec)))
-            fill!(timestep_mem, zero(eltype(u_vec)))
+            u_timestep_it = @view(u_timestep[(it - 2) * N_coords_inner + 1:(it - 1) * N_coords_inner])
+            u_timestep_it .= zero(eltype(u_vec))
+            timestep_mem_it = @view(timestep_mem[(it - 2) * timestep_alloc_size_inner + 1:(it - 1) * timestep_alloc_size_inner])
+            timestep_mem_it .= zero(eltype(u_vec))
+            # fill!(u_timestep, zero(eltype(u_vec)))
+            # fill!(timestep_mem, zero(eltype(u_vec)))
             u_it_last = @view(u_vec[(it - 2) * N_coords_inner + 1:(it - 1) * N_coords_inner])
             u_it = @view(u_vec[(it - 1) * N_coords_inner + 1:it * N_coords_inner])
-            timestep_inner(timestep_mem, u_timestep, u_it_last, t_inner[it - 1], t_inner[it] - t_inner[it - 1], p_timestep_inner)
-            l_pde += sum((u_timestep - u_it).^2)/(N_coords_inner * Nt_inner)
+            timestep_inner(timestep_mem_it, u_timestep_it, u_it_last, t_inner[it - 1], t_inner[it] - t_inner[it - 1], p_timestep_inner)
+            l_pde += sum((u_timestep_it - u_it).^2)/(N_coords_inner * Nt_inner)
         end
 
         l = l_exact + l_pde
 
         if extra_inner !== nothing && p_extra_inner !== nothing
-            du_extra = zeros(eltype(u_vec), len_extra_inner)
+            du_extra .= zero(eltype(u_vec))
             extra_inner(du_extra, u_vec, p_extra_inner, iter_inner[])
             l_extra = sum(du_extra.^2)/(len_extra_inner)
             l += l_extra
@@ -60,7 +66,7 @@ function odil_lbfgs(timestep, p_timestep, N_coords, u_reference_vals, reference_
     # prob = OptimizationProblem(optf, u_iter0, p_all) 
     # opt = LBFGS(m = 50)
     opt = LBFGS()
-    optf = Enzyme.Const((u_vec) -> loss(u_vec, p_all))
+    optf = (u_vec) -> loss(u_vec, p_all)
 
     if info_prints
         add!(callback_set, InfoPrintCallback())
@@ -76,7 +82,7 @@ function odil_lbfgs(timestep, p_timestep, N_coords, u_reference_vals, reference_
         println("Starte Lösung...")
     end
     # res = solve(prob, opt, maxiters = max_iterations, callback = callback)
-    res = optimize(optf, u_iter0, opt, Optim.Options(iterations = max_iterations, callback = callback); autodiff = AutoEnzyme())
+    res = optimize(optf, u_iter0, opt, Optim.Options(iterations = max_iterations, callback = callback); autodiff = AutoEnzyme(; mode = Enzyme.set_runtime_activity(Enzyme.Reverse), function_annotation=Enzyme.Duplicated))
     
     if info_prints
         println("Optimierung beendet!")

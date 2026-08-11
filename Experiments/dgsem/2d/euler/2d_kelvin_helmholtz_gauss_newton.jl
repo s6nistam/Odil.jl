@@ -19,14 +19,32 @@ dt = [t[i + 1] - t[i] for i in 1:Nt-1]
 
 u_exact = reduce(hcat, vec.(sol.u))
 
+# function extra(du, u, p, iter)
+#     Nx, Nt, dt = p
+#     idx = LinearIndices((Nx, Nt))
+    
+#     k = 2.0^(-iter/2.0)
+
+#     idx = LinearIndices((Nx, Nt))
+
+#     for i in 1:Nt - 1
+#         du[idx[:, i]] .= k * (u[idx[:, i + 1]] - u[idx[:, i]]) / dt[i]
+#     end
+
+#     return nothing
+# end
+
+# p_extra = (Nx, Nt, dt)
+# len_extra = Nx * (Nt - 1)
+
 timestep! = get_timestep(Odil.CarpenterKennedy2N54())
 p_timestep = (ode.f, ode.p)
 
-callback_set = OdilCallbackSet(PlotCallback(100))
+callback_set = OdilCallbackSet(PlotCallback(1), InfoPrintCallback(1))
 
 problem = OdilProblem(timestep!, p_timestep, Nx, ode.u0, 1:length(ode.u0), t, x, y; timestep_alloc_size = 2 * Nx, u_iter0 = repeat(ode.u0, Nt))
-# res = odil_gauss_newton(problem; max_iterations = 100, callback_set = callback_set)
-res = odil_timestepping(problem, odil_gauss_newton, "odil_2d_kelvin_helmholtz_gauss_newton"; t_chunk_size = 8, max_iterations_per_chunk = 20, callback_set = callback_set)
+# problem = OdilProblem(timestep!, p_timestep, Nx, ode.u0, 1:length(ode.u0), t, x, y; timestep_alloc_size = 2 * Nx, u_iter0 = repeat(ode.u0, Nt), extra = extra, p_extra = p_extra, len_extra = len_extra)
+res = odil_gauss_newton(problem; max_iterations = 200, callback_set = callback_set)
 # res = reconstruct_solution_from_chunks(problem, "odil_2d_kelvin_helmholtz_gauss_newton"; t_chunk_size = 8)
 write_vtk(problem, res, "odil_2d_kelvin_helmholtz_gauss_newton")
 

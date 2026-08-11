@@ -1,7 +1,9 @@
 using Odil
 include("./dgsem_advection.jl")
 
-polydeg = 2
+Trixi.TrixiBase.disable_debug_timings()
+
+polydeg = 3
 refinement_level = 4
 ndims = 1
 variables = Int64(length(ode.u0)/((polydeg + 1)^ndims * (2^refinement_level)^ndims))

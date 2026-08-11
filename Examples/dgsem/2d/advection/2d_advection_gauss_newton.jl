@@ -1,6 +1,8 @@
 using Odil
 include("./dgsem_advection.jl")
 
+Trixi.TrixiBase.disable_debug_timings()
+
 polydeg = 2
 refinement_level = 3
 ndims = 2

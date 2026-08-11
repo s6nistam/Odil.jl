@@ -36,7 +36,7 @@ volume_flux = flux_ranocha
 polydeg = 3
 basis = LobattoLegendreBasis(polydeg)
 
-# volume_integral_weakform = VolumeIntegralWeakForm()
+volume_integral_weakform = VolumeIntegralWeakForm()
 volume_integral_fluxdiff = VolumeIntegralFluxDifferencing(volume_flux)
 
 # This indicator compares the entropy production of the weak form to the 
@@ -44,24 +44,23 @@ volume_integral_fluxdiff = VolumeIntegralFluxDifferencing(volume_flux)
 # If the weak form dissipates more entropy than the true evolution
 # the indicator renders this admissible. Otherwise, the more stable
 # volume integral is to be used.
-# indicator = IndicatorEntropyChange(maximum_entropy_increase = 0.0)
+indicator = IndicatorEntropyChange(maximum_entropy_increase = 0.0)
 
-# # Adaptive volume integral using the entropy change indicator to perform the 
-# # stabilized/EC volume integral when needed and keeping the weak form if it is more diffusive.
-# volume_integral = VolumeIntegralAdaptive(indicator = indicator,
-#                                          volume_integral_default = volume_integral_weakform,
-#                                          volume_integral_stabilized = volume_integral_fluxdiff)
+# Adaptive volume integral using the entropy change indicator to perform the 
+# stabilized/EC volume integral when needed and keeping the weak form if it is more diffusive.
+volume_integral = VolumeIntegralAdaptive(indicator = indicator,
+                                         volume_integral_default = volume_integral_weakform,
+                                         volume_integral_stabilized = volume_integral_fluxdiff)
 
 #volume_integral = volume_integral_weakform # Crashes
 #volume_integral = volume_integral_fluxdiff # Crashes as well!
 
-solver = DGSEM(basis, surface_flux, volume_integral_fluxdiff)
+solver = DGSEM(basis, surface_flux, volume_integral)
 
 coordinates_min = (-1.0, -1.0)
 coordinates_max = (1.0, 1.0)
 mesh = TreeMesh(coordinates_min, coordinates_max,
                 initial_refinement_level = 5,
-                n_cells_max = 100_000,
                 periodicity = true)
 
 semi = SemidiscretizationHyperbolic(mesh, equations, initial_condition, solver;
@@ -70,7 +69,7 @@ semi = SemidiscretizationHyperbolic(mesh, equations, initial_condition, solver;
 ###############################################################################
 # ODE solvers, callbacks etc.
 
-tspan = (0.0, 5.25)
+tspan = (0.0, 3.7)
 ode = semidiscretize(semi, tspan)
 
 summary_callback = SummaryCallback()
