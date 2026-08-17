@@ -65,9 +65,7 @@ function odil_lbfgs(timestep, p_timestep, N_coords, u_reference_vals, reference_
     # prob = OptimizationProblem(optf, u_iter0, p_all) 
     # opt = LBFGS(m = 50)
     opt = LBFGS()
-    f = (u_vec) -> loss(u_vec, p_all)
-    df = Enzyme.make_zero(f)
-    optf = Enzyme.Duplicated(f, df)
+    optf = (u_vec) -> loss(u_vec, p_all)
 
     if info_prints
         add!(callback_set, InfoPrintCallback())
@@ -83,7 +81,7 @@ function odil_lbfgs(timestep, p_timestep, N_coords, u_reference_vals, reference_
         println("Starte Lösung...")
     end
     # res = solve(prob, opt, maxiters = max_iterations, callback = callback)
-    res = optimize(optf, u_iter0, opt, Optim.Options(iterations = max_iterations, callback = callback, g_tol = 1e-12); autodiff = AutoEnzyme())
+    res = optimize(optf, u_iter0, opt, Optim.Options(iterations = max_iterations, callback = callback, g_tol = 1e-12); autodiff = AutoEnzyme(; function_annotation=Enzyme.Duplicated))
     
     if info_prints
         println("Optimierung beendet!")
