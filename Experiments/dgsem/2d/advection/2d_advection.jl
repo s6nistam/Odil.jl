@@ -28,9 +28,25 @@ callback_set = OdilCallbackSet(PlotCallback(100))
 problem = OdilProblem(timestep!, p_timestep, Nx, ode.u0, 1:length(ode.u0), t, x, y; timestep_alloc_size = 2 * Nx, u_iter0 = vec(repeat(ode.u0, Nt)))
 # problem = OdilProblem(timestep!, p_timestep, Nx, ode.u0, 1:length(ode.u0), t, x, y; timestep_alloc_size = Nx)
 res = odil_gauss_newton(problem; max_iterations = 20, callback_set = callback_set)
+write_vtk(problem, res, "odil_2d_advection")
+write_csv(problem, res, "odil_2d_advection")
 
 # plot(problem, u_exact, res)
+for i in 1:length(res)
+    if res[i] != u_exact[i]
+        res[i] = log10(abs(u_exact[i] - res[i]))
+    end
+end
+
+min = minimum(res)
+
+for i in 1:length(res)
+    if res[i] == u_exact[i]
+        res[i] = min - 1
+    end
+end
+
 plot(problem, res)
 
-write_vtk(problem, res, "odil_2d_advection")
-# write_csv(problem, res, "odil_2d_advection")
+write_vtk(problem, res, "odil_2d_advection_errors")
+write_csv(problem, res, "odil_2d_advection_errors")
