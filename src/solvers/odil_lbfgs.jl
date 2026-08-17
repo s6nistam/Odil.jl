@@ -81,7 +81,7 @@ function odil_lbfgs(timestep, p_timestep, N_coords, u_reference_vals, reference_
         println("Starte Lösung...")
     end
     # res = solve(prob, opt, maxiters = max_iterations, callback = callback)
-    res = optimize(optf, u_iter0, opt, Optim.Options(iterations = max_iterations, callback = callback, g_tol = 1e-12); autodiff = AutoEnzyme(; function_annotation=Enzyme.Duplicated))
+    res = optimize(optf, u_iter0, opt, Optim.Options(iterations = max_iterations, callback = callback, g_tol = 1e-12); autodiff = AutoEnzyme(; mode = Enzyme.set_runtime_activity(Enzyme.Reverse), function_annotation=Enzyme.Duplicated))
     
     if info_prints
         println("Optimierung beendet!")
