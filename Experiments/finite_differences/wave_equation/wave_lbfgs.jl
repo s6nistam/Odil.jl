@@ -24,13 +24,13 @@ u_t_t0  = [get_exact_wave_velocity(x[ix], t[1]) for ix in 1:Nx]
 
 u_reference_vals = [u_t0; u_bounds_left; u_bounds_right; u_t_t0]
 
-idx = LinearIndices((Nx, 2, Nt))
+idx = LinearIndices((2, Nx, Nt))
 
-idx_t0  = [idx[ix, 1, 1] for ix in 1:Nx]
+idx_t0  = [idx[1, ix, 1] for ix in 1:Nx]
 idx_bounds_left = [idx[1, 1, it] for it in 2:Nt]
-idx_bounds_right = [idx[Nx, 1, it] for it in 2:Nt]
+idx_bounds_right = [idx[1, Nx, it] for it in 2:Nt]
 
-idx_t_t0  = [idx[ix, 2, 1] for ix in 1:Nx]
+idx_t_t0  = [idx[2, ix, 1] for ix in 1:Nx]
 
 reference_val_indices = [idx_t0; idx_bounds_left; idx_bounds_right; idx_t_t0]
 
@@ -41,8 +41,7 @@ u = odil_lbfgs(problem; max_iterations = 100000, callback_set = callback_set)
 
 write_vtk(problem, u, "odil_wave_lbfgs")
 
-u = reshape(u, Nx, 2, Nt)
+u = reshape(u, 2, Nx, Nt)
 
-plot_1d_time_comparison(x, t, u_exact, u[:, 1, :])
-# plot_1d_time_comparison(x, t, u_t_exact, u[:, 2, :])
-
+plot_1d_time_comparison(x, t, u_exact, u[1, :, :])
+# plot_1d_time_comparison(x, t, u_t_exact, u[2, :, :])

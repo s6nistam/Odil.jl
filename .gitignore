@@ -1,5 +1,6 @@
 .DS_Store
 *.vtr
+*.vti
 *.pvd
 *.h5
 *.dat
