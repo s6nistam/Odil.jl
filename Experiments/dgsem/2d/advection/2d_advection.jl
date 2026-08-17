@@ -3,7 +3,7 @@ include("./dgsem_advection.jl")
 
 Trixi.TrixiBase.disable_debug_timings()
 
-polydeg = 2
+polydeg = 3
 refinement_level = 3
 ndims = 2
 variables = Int64(length(ode.u0)/((polydeg + 1)^ndims * (2^refinement_level)^ndims))
@@ -30,8 +30,7 @@ problem = OdilProblem(timestep!, p_timestep, Nx, ode.u0, 1:length(ode.u0), t, x,
 res = odil_gauss_newton(problem; max_iterations = 20, callback_set = callback_set)
 
 # plot(problem, u_exact, res)
-diff = [u_exact[i] - res[i] for i in 1:length(res)]
-plot(problem, diff; c_min = minimum(diff), c_max = maximum(diff))
+plot(problem, res)
 
 write_vtk(problem, res, "odil_2d_advection_gauss_newton")
 # write_csv(problem, res, "odil_2d_advection_gauss_newton")

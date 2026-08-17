@@ -3,7 +3,7 @@ include("./dgsem_advection.jl")
 
 Trixi.TrixiBase.disable_debug_timings()
 
-polydeg = 1
+polydeg = 3
 refinement_level = 3
 ndims = 3
 variables = Int64(length(ode.u0)/((polydeg + 1)^ndims * (2^refinement_level)^ndims))
