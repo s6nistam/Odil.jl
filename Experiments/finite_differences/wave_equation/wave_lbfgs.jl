@@ -39,6 +39,8 @@ callback_set = OdilCallbackSet(PlotCallback(100))
 problem = OdilProblem(timestep!, p, 2 * Nx, u_reference_vals, reference_val_indices, t, x; timestep_alloc_size = 2 * Nx)
 u = odil_lbfgs(problem; max_iterations = 100000, callback_set = callback_set)
 
+write_vtk(problem, u, "odil_wave_lbfgs")
+
 u = reshape(u, Nx, 2, Nt)
 
 plot_1d_time_comparison(x, t, u_exact, u[:, 1, :])

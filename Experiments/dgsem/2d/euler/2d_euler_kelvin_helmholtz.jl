@@ -29,7 +29,6 @@ problem = OdilProblem(timestep!, p_timestep, Nx, ode.u0, 1:length(ode.u0), t, x,
 res = odil_timestepping(problem, odil_gauss_newton, "odil_2d_kelvin_helmholtz"; t_chunk_size = 8, max_iterations_per_chunk = 20, callback_set = callback_set)
 # res = reconstruct_solution_from_chunks(problem, "odil_2d_kelvin_helmholtz"; t_chunk_size = 8)
 write_vtk(problem, res, "odil_2d_kelvin_helmholtz")
-write_csv(problem, res, "odil_2d_kelvin_helmholtz")
 
 # plot(problem, u_exact, res)
 for i in 1:length(res)
@@ -49,4 +48,3 @@ end
 plot(problem, res)
 
 write_vtk(problem, res, "odil_2d_kelvin_helmholtz_errors")
-write_csv(problem, res, "odil_2d_kelvin_helmholtz_errors")

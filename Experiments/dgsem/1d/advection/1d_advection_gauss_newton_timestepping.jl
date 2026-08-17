@@ -29,7 +29,6 @@ problem = OdilProblem(timestep!, p_timestep, Nx, ode.u0, 1:length(ode.u0), t, x;
 # res = odil_gauss_newton(problem; max_iterations = 300)
 res = odil_timestepping(problem, odil_gauss_newton, "odil_1d_advection_gauss_newton_timestepping"; t_chunk_size = 10, max_iterations_per_chunk = 200, callback_set = callback_set)
 write_vtk(problem, res, "odil_1d_advection_gauss_newton_timestepping")
-write_csv(problem, res, "odil_1d_advection_gauss_newton_timestepping")
 
 function exact_solution(x, t)
     return 1 + 0.5 * sin(π * (x - t))
@@ -90,5 +89,4 @@ plot(problem, u_exact, res)
 
 
 write_vtk(problem, res, "odil_1d_advection_gauss_newton_timestepping_errors")
-write_csv(problem, res, "odil_1d_advection_gauss_newton_timestepping_errors")
 

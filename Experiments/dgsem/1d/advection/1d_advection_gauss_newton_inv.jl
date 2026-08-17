@@ -53,7 +53,6 @@ for i in 1:100
     problem = OdilProblem(timestep!, p_timestep, Nx, u_exact[index], index, t, x; timestep_alloc_size = 2 * Nx)
     res = odil_gauss_newton(problem; max_iterations = 200, callback_set = callback_set)
     write_vtk(problem, res, "odil_1d_advection_gauss_newton_inv_$i")
-    write_csv(problem, res, "odil_1d_advection_gauss_newton_inv_$i")
 end
 println("Divergence count: $div_count")
 

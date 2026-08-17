@@ -35,6 +35,8 @@ callback_set = OdilCallbackSet(PlotCallback(100))
 problem = OdilProblem(timestep!, p, Nx, u_reference_vals, reference_val_indices, t, x; extra = extra, p_extra = p_extra, len_extra = len_extra, timestep_alloc_size = Nx)
 u = odil_gauss_newton(problem; max_iterations = max_iterations, callback_set = callback_set)
 
+write_vtk(problem, u, "odil_burgers_gauss_newton")
+
 u = reshape(u, Nx, Nt)
 
 plot_1d_time(x, t, u)
