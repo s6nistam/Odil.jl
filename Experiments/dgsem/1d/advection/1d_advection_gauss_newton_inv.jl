@@ -72,4 +72,4 @@ println("Divergence count: $div_count")
 # plot(problem, u_exact, res)
 # plot(problem, res)
 
-# write_vtk(problem, res, "odil_1d_advection_gauss_newton")
+# write_vtk(problem, res, "odil_1d_advection_gauss_newton_inv")

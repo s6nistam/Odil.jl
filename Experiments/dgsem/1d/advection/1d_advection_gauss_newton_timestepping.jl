@@ -27,7 +27,7 @@ callback_set = OdilCallbackSet(PlotCallback(100))
 problem = OdilProblem(timestep!, p_timestep, Nx, ode.u0, 1:length(ode.u0), t, x; timestep_alloc_size = 2 * Nx)
 # problem = OdilProblem(timestep!, p_timestep, Nx, ode.u0, 1:length(ode.u0), t, x; timestep_alloc_size = Nx)
 # res = odil_gauss_newton(problem; max_iterations = 300)
-res = odil_timestepping(problem, odil_gauss_newton, "odil_1d_advection_gauss_newton"; t_chunk_size = 10, max_iterations_per_chunk = 200, callback_set = callback_set)
+res = odil_timestepping(problem, odil_gauss_newton, "odil_1d_advection_gauss_newton_timestepping"; t_chunk_size = 10, max_iterations_per_chunk = 200, callback_set = callback_set)
 
 function exact_solution(x, t)
     return 1 + 0.5 * sin(π * (x - t))

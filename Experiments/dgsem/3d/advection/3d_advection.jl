@@ -30,4 +30,4 @@ res = odil_gauss_newton(problem; max_iterations = 10, callback_set = callback_se
 
 plot(problem, u_exact, res)
 
-write_vtk(problem, res, "odil_3d_advection_gauss_newton")
+write_vtk(problem, res, "odil_3d_advection")
