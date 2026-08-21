@@ -25,6 +25,7 @@ p_timestep = (ode.f, ode.p)
 callback_set = OdilCallbackSet(PlotCallback(100))
 
 problem = OdilProblem(timestep!, p_timestep, Nx, ode.u0, 1:length(ode.u0), t, x; timestep_alloc_size = 2 * Nx)
+write_vtk(problem, u_exact, "odil_1d_advection_trixi")
 # problem = OdilProblem(timestep!, p_timestep, Nx, ode.u0, 1:length(ode.u0), t, x; timestep_alloc_size = Nx)
 # res = odil_gauss_newton(problem; max_iterations = 300)
 res = odil_timestepping(problem, odil_gauss_newton, "odil_1d_advection_gauss_newton_timestepping"; t_chunk_size = 10, max_iterations_per_chunk = 200, callback_set = callback_set)
@@ -35,20 +36,35 @@ function exact_solution(x, t)
 end
 
 exact = [exact_solution(x[ix], t[it]) for ix in 1:Nx, it in 1:Nt]
+write_vtk(problem, exact, "odil_1d_advection_exact")
 
 for i in 1:length(res)
-    if res[i] != exact[i]
-        res[i] = log10(abs(exact[i] - res[i]))
+    if res[i] != u_exact[i]
+        res[i] = log10(abs(u_exact[i] - res[i]))
     end
 end
 
 min = minimum(res)
 
 for i in 1:length(res)
-    if u_exact[i] == exact[i]
-        u_exact[i] = min - 1
+    if res[i] == u_exact[i]
+        res[i] = min - 1
     end
 end
+
+# for i in 1:length(res)
+#     if res[i] != exact[i]
+#         res[i] = log10(abs(exact[i] - res[i]))
+#     end
+# end
+
+# min = minimum(res)
+
+# for i in 1:length(res)
+#     if res[i] == exact[i]
+#         res[i] = min - 1
+#     end
+# end
 
 for i in 1:length(res)
     if u_exact[i] != exact[i]
@@ -66,27 +82,11 @@ end
 
 
 
-
-# for i in 1:length(res)
-#     if res[i] != u_exact[i]
-#         res[i] = log10(abs(u_exact[i] - res[i]))
-#     end
-# end
-
-# min = minimum(res)
-
-# for i in 1:length(res)
-#     if res[i] == u_exact[i]
-#         res[i] = min - 1
-#     end
-# end
-
-
-
 # plot(problem, exact, u_exact)
 # plot(problem, res)
 plot(problem, u_exact, res)
 
 
 write_vtk(problem, res, "odil_1d_advection_gauss_newton_timestepping_errors")
+write_vtk(problem, u_exact, "odil_1d_advection_trixi_errors")
 
